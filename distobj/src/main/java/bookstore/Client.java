@@ -13,7 +13,6 @@ public class Client {
         DO d = new DO(a);
 
         Store s =  (Store) d.oImport(new ObjRef(a,1,"Store"));
-
         Book b = s.search("one");
 
         System.out.println("isbn = " + b.getIsbn());
