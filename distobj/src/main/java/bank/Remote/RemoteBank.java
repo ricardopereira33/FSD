@@ -8,8 +8,10 @@ import bookstore.Data.Util;
 import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
+import bookstore.Rep.CartAddRep;
 import bookstore.Rep.StoreMakeCartRep;
 import bookstore.Rep.StoreSearchRep;
+import bookstore.Req.CartAddReq;
 import bookstore.Req.StoreMakeCartReq;
 import bookstore.Req.StoreSearchReq;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
@@ -48,6 +50,17 @@ public class RemoteBank implements Bank {
 
     @Override
     public boolean transfer(String recv, String send, int value) {
+        TransferRep r = null;
+        try {
+            r = (TransferRep) tc.execute(() ->
+                    c.sendAndReceive(new TransferReq(recv, send, value, 1))
+            ).join().get();
+
+            return r.ok;
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+
         return false;
     }
 }
