@@ -31,8 +31,9 @@ public class CartImp implements Cart {
     }
 
     @Override
-    public boolean buy() {
+    public int buy() {
+        int total = content.stream().mapToInt(Book::getPrice).sum();
         content.clear();
-        return true;
+        return total;
     }
   }

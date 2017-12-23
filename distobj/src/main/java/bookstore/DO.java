@@ -37,11 +37,11 @@ public class DO {
     
     public Object oImport(ObjRef or) throws UnexpectedException{
         switch(or.cls){
-            case "Cart"   : return u.makeCart(or);
-            case "Store"  : return u.makeStore(or);
+            case "Bank"   : return u.makeCart(or);
+            case "AccountImp"  : return u.makeStore(or);
             case "Book"   : return u.makeBook(or);
-            /*case "RemoteCart" : return makeRemoteCart(or);
-            case "RemoteStore": return makeRemoteStore(or);*/
+            /*case "RemoteAccount" : return makeRemoteCart(or);
+            case "RemoteBank": return makeRemoteStore(or);*/
         }
         return null;
     }

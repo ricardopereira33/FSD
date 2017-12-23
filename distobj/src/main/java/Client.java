@@ -1,10 +1,8 @@
-package bookstore;
-
 import bookstore.Data.ObjRef;
 import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
-import bookstore.Remote.RemoteStore;
+import bookstore.DO;
 import io.atomix.catalyst.transport.Address;
 
 public class Client {
@@ -12,7 +10,7 @@ public class Client {
         Address a = new Address("127.0.0.1:10000");
         DO d = new DO(a);
 
-        Store s =  (Store) d.oImport(new ObjRef(a,1,"Store"));
+        Store s =  (Store) d.oImport(new ObjRef(a,1,"AccountImp"));
         Book b = s.search("one");
 
         System.out.println("isbn = " + b.getIsbn());

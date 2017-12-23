@@ -1,8 +1,11 @@
-package bookstore.Remote;
+package bank.Remote;
 
+import bank.Interfaces.Account;
+import bank.Rep.TransferRep;
+import bank.Req.TransferReq;
 import bookstore.Data.Util;
-import bookstore.Impl.BookImp;
 import bookstore.Interfaces.Book;
+import bookstore.Interfaces.Cart;
 import bookstore.Rep.CartAddRep;
 import bookstore.Rep.CartBuyRep;
 import bookstore.Req.CartAddReq;
@@ -15,42 +18,49 @@ import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 
-public class RemoteBook implements Book{
+public class RemoteAccount implements Account{
     private final ThreadContext tc;
     private final Connection c;
     private final Address address;
     private int id;
     private Util u;
-
-    public RemoteBook(int id, Address address) throws Exception {
+    
+    public RemoteAccount(int id, Address address) throws Exception {
         Transport t = new NettyTransport();
         u = new Util();
         tc = new SingleThreadContext("srv-%d", new Serializer());
-        this.id = id;
         this.address = address;
+        this.id = id;
+        registeMsg();
 
         c = tc.execute(() ->
                 t.client().connect(address)
         ).join().get();
     }
 
+    private void registeMsg() {
+        tc.serializer().register(TransferRep.class);
+        tc.serializer().register(TransferReq.class);
+    }
+
 
     @Override
-    public int getIsbn() {
-        return id;
+    public int getValue() {
+        return 0;
     }
 
     @Override
-    public String getTitle() {
-        return null;
+    public void setValue(int value) {
+
     }
 
     @Override
-    public String getAuthor() {
-        return null;
-    }
-    
-    @Override
-    public int getPrice() { return 0; }
+    public void addValue(int value) {
 
+    }
+
+    @Override
+    public void rmValue(int value) {
+
+    }
 }

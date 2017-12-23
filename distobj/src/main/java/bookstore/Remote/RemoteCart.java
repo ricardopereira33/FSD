@@ -30,7 +30,7 @@ public class RemoteCart implements Cart{
         this.address = address;
         this.id = id;
         registeMsg();
-        
+
         c = tc.execute(() ->
                 t.client().connect(address)
         ).join().get();
@@ -60,18 +60,18 @@ public class RemoteCart implements Cart{
     }
 
     @Override
-    public boolean buy() {
+    public int buy() {
         CartBuyRep r = null;
         try {
             r = (CartBuyRep) tc.execute(() ->
                     c.sendAndReceive(new CartBuyReq(id))
             ).join().get();
             
-            return r.ok;
+            return r.price;
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
         
-        return false;
+        return 0;
     }
 }

@@ -13,8 +13,8 @@ public class StoreImp implements Store {
 
     public StoreImp() {
         books = new HashMap<>();
-        books.put(1, new BookImp(1, "one", "someone"));
-        books.put(2, new BookImp(2, "other", "someother"));
+        books.put(1, new BookImp(1, "one", "someone", 10));
+        books.put(2, new BookImp(2, "other", "someother", 20));
     }
 
     @Override

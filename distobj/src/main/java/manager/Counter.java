@@ -11,9 +11,11 @@ package manager;
  */
 class Counter {
     private int num;
+    private int index;
     
     public Counter(int num){
         this.num = num;
+        this.index = 0;
     }
     
     public void incr(int sum){
@@ -26,5 +28,13 @@ class Counter {
     
     public int getNum(){
         return num;
+    }
+    
+    public void setIndex(int i){
+        this.index = i;
+    }
+    
+    public int getIndex(){
+        return index;
     }
 }

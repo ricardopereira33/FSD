@@ -16,21 +16,24 @@ import io.atomix.catalyst.serializer.Serializer;
  */
 public class CartBuyRep implements CatalystSerializable {
     public boolean ok;
+    public int price;
 
     public CartBuyRep() {}
 
-    public CartBuyRep(boolean result) {
+    public CartBuyRep(boolean result, int price) {
+        this.price = price;
         this.ok = result;
     }
     
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
+        bo.writeInt(price);
         bo.writeBoolean(ok);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         ok = bi.readBoolean();
+        price = bi.readInt();
     }
-    
 }

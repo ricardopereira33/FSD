@@ -13,6 +13,6 @@ import bookstore.Impl.BookImp;
  */
 public interface Cart {
     
-    public boolean add(Book b);
-    public boolean buy();
+    boolean add(Book b);
+    int buy();
 }
