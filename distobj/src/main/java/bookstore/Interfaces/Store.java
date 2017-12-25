@@ -7,6 +7,8 @@ package bookstore.Interfaces;
 
 import bookstore.Impl.BookImp;
 
+import java.util.List;
+
 /**
  *
  * @author Ricardo

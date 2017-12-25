@@ -5,14 +5,17 @@ import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StoreImp implements Store {
     
-    public Map<Integer,BookImp> books;
+    public Map<Integer, BookImp> books;
+    public Map<Integer, BookImp> history;
 
     public StoreImp() {
         books = new HashMap<>();
+        history = new HashMap<>();
         books.put(1, new BookImp(1, "one", "someone", 10));
         books.put(2, new BookImp(2, "other", "someother", 20));
     }
@@ -33,5 +36,11 @@ public class StoreImp implements Store {
     @Override
     public Cart newCart(){
         return new CartImp(this);
+    }
+
+    public void addHistory(List<Book> content) {
+        for(Book b: content){
+            history.put(b.getIsbn(), (BookImp) b);
+        }
     }
 }

@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class CartImp implements Cart {
     private List<Book> content;
-    private Store s;
+    private StoreImp s;
 
     public CartImp(Store s){
         content = new ArrayList<>();
-        this.s = s;
+        this.s = (StoreImp) s;
     }
 
     @Override
@@ -32,6 +32,7 @@ public class CartImp implements Cart {
 
     @Override
     public int buy() {
+        s.addHistory(content);
         int total = content.stream().mapToInt(Book::getPrice).sum();
         content.clear();
         return total;

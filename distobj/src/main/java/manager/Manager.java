@@ -1,5 +1,6 @@
 package manager;
 
+import io.atomix.catalyst.transport.Connection;
 import log.Abort;
 import log.Commit;
 import log.Prepare;
