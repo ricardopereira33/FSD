@@ -27,6 +27,7 @@ import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Server {
     public static void main(String[] args) throws Exception {
