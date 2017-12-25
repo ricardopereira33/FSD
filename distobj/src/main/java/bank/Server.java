@@ -39,21 +39,13 @@ public class Server {
         Log log = new Log("log_bank");
 
         // Regist Messages and Handlers
-
         registMsg(tc);
-        registHandlers(t, tc, address, d);
-        registLogHandlers(log);
-
-        Bank b = new BankImp();
-        d.oExport(b);
-
-        // Save initial store
-        log.append(b);
+        registLogHandlers(log, t, tc, address, d);
 
         System.out.println("Server running...");
     }
 
-    private static void registLogHandlers(Log log) {
+    private static void registLogHandlers(Log log, Transport t, ThreadContext tc, Address address, DO d) {
         log.handler(Prepare.class, (sender, msg)-> {
             System.out.println("Prepare");
         });
@@ -64,7 +56,13 @@ public class Server {
             System.out.println("Abort");
         });
         log.open().thenRun(()-> {
+            registHandlers(t, tc, address, d);
 
+            Bank b = new BankImp();
+            d.oExport(b);
+
+            // Save initial store
+            log.append(b);
         });
     }
 

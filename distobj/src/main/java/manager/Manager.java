@@ -28,7 +28,6 @@ public class Manager {
         };
         Transport t = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
-        Counter count = new Counter(0);
 
         // log_0 is coord log
         Log l = new Log("log_manager");
@@ -39,6 +38,9 @@ public class Manager {
             });
             l.handler(Commit.class, (sender, msg)-> {
                 System.out.println("Commit");
+            });
+            l.handler(Integer.class, (sender, msg)-> {
+
             });
             l.handler(Abort.class, (sender, msg)->{
                 System.out.println("Abort");

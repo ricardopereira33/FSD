@@ -1,5 +1,6 @@
 package bookstore;
 
+import bookstore.Data.Data;
 import bookstore.Data.ObjRef;
 import bookstore.Impl.StoreImp;
 import bookstore.Interfaces.Book;
@@ -39,21 +40,13 @@ public class Server {
         Log log = new Log("log_bookstore");
 
         // Regist Messages and Handlers
-
         registMsg(tc);
-        registHandlers(t, tc, address, d);
-        registLogHandlers(log);
-
-        Store s = new StoreImp();
-        d.oExport(s);
-
-        // Save initial store
-        log.append(s);
+        registLogHandlers(log, t, tc, address, d);
 
         System.out.println("Server running...");
     }
 
-    private static void registLogHandlers(Log log) {
+    private static void registLogHandlers(Log log, Transport t, ThreadContext tc, Address address, DO d) {
         log.handler(Prepare.class, (sender, msg)-> {
             System.out.println("Prepare");
         });
@@ -63,8 +56,16 @@ public class Server {
         log.handler(Abort.class, (sender, msg)->{
             System.out.println("Abort");
         });
-        log.open().thenRun(()-> {
+        log.handler(Data.class, (sender, msg) -> {
 
+        });
+        log.open().thenRun(()-> {
+            registHandlers(t, tc, address, d);
+            Store s = new StoreImp();
+            d.oExport(s);
+
+            // Save initial store
+            log.append(s);
         });
     }
 
