@@ -1,6 +1,5 @@
 package manager;
 
-import io.atomix.catalyst.transport.Connection;
 import log.Abort;
 import log.Commit;
 import log.Prepare;
@@ -10,25 +9,24 @@ import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
-import java.io.IOException;
-import pt.haslab.ekit.Clique;
+
+import manager.Data.Transations;
+import manager.Req.CommitReq;
+import manager.Req.ContextReq;
+import manager.Req.NewResourceReq;
 import pt.haslab.ekit.Log;
 
 /**
  *
  * @author Ricardo
  */
-public class Manager {
+public class Server {
     
     public static void main(String[] args) throws Exception{
-        Address[] addresses = new Address[]{
-            new Address("127.0.0.1:1234"),
-            new Address("127.0.0.1:1235"),
-            new Address("127.0.0.1:1236"),
-        };
+        Address address = new Address(":10202");
         Transport t = new NettyTransport();
-        ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
-
+        ThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
+        Transations txs = new Transations();
         // log_0 is coord log
         Log l = new Log("log_manager");
         
@@ -47,9 +45,27 @@ public class Manager {
             });
             l.open().thenRun(()-> { 
                 System.out.println("Entrei");
-                Clique c = new Clique(t,0,addresses);
-
+                registHandlers(address, t, tc);
             }); 
         }).join();
+    }
+
+    private static void registHandlers(Address address, Transport t, ThreadContext tc) {
+        tc.execute( () -> {
+            t.server().listen(address, (c) -> {
+                c.handler(ContextReq.class, (m) -> {
+                    // new Transation
+
+                });
+                c.handler(NewResourceReq.class, (m) -> {
+                    // add resource in the transation
+
+                });
+                c.handler(CommitReq.class, (m) -> {
+                    // end Transtion
+
+                });
+            });
+        });
     }
 }
