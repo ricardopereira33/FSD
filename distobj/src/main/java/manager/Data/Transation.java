@@ -3,22 +3,40 @@ package manager.Data;
 import io.atomix.catalyst.transport.Address;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Transation {
     private int id;
-    private List<Address> address;
+    private int regist;
+    private Map<Integer, Address> address;
 
     public Transation(int count) {
         this.id = count;
-        this.address = new ArrayList<>();
+        this.regist = 0;
+        this.address = new HashMap<>();
     }
 
-    public void addAddress(Address address){
-        this.address.add(address);
+    public void addAddress(int rescid, Address address){
+        this.address.put(rescid, address);
     }
 
     public List<Address> getAddress(){
-        return address;
+        List<Address> list = (List) address.values();
+        return list;
+    }
+
+    public int getSize() {
+        return address.size();
+    }
+
+    public boolean arrived() {
+        regist++;
+        if(regist == address.size()){
+            regist = 0;
+            return true;
+        }
+        return false;
     }
 }

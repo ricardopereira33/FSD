@@ -15,23 +15,25 @@ import io.atomix.catalyst.serializer.Serializer;
  * @author Ricardo
  */
 public class Prepare implements CatalystSerializable {
-    private String s;
+    public String s;
+    public int txid;
 
     public Prepare() {}
 
-    public Prepare(String s){
+    public Prepare(String s, int txid){
         this.s = s;
+        this.txid = txid;
     }
-
 
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
         bo.writeString(s);
+        bo.writeInt(txid);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         s = bi.readString();
+        txid = bi.readInt();
     }
-    
 }

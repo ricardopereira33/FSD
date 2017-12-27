@@ -23,12 +23,7 @@ import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import log.*;
-import manager.Communicate;
-import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
-
-import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Server {
     public static void main(String[] args) throws Exception {
@@ -72,6 +67,7 @@ public class Server {
     private static void registLog(Connection c) {
         c.handler(Prepare.class, (msg)-> {
             System.out.println("Prepare");
+            c.send(new Ok("Ok", msg.txid));
         });
         c.handler(Commit.class, (msg)-> {
             System.out.println("Commit");
