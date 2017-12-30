@@ -33,7 +33,7 @@ public class CartBuyRep implements CatalystSerializable {
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
-        ok = bi.readBoolean();
         price = bi.readInt();
+        ok = bi.readBoolean();
     }
 }

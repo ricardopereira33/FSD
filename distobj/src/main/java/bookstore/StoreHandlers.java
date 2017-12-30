@@ -182,13 +182,16 @@ public class StoreHandlers {
         tc.execute(()->{
             cli.handler(Prepare.class, (s, m) -> {
                 System.out.println("Prepare");
+                //l.append(m);
                 cli.send(s,new Ok("Ok"));
             });
             cli.handler(Commit.class, (s, m) -> {
-                System.out.println("commit");
+                System.out.println("Commit");
+                //l.append(m);
             });
             cli.handler(Rollback.class, (s, m) -> {
-                System.out.println("rollback");
+                System.out.println("Rollback");
+                //rollback();
             });
             cli.open().thenRun(() ->{
                 System.out.println("2PC begin.");

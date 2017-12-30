@@ -20,18 +20,20 @@ public class Client {
          *
          * m.begin();
          * */
+        System.out.println("Begin.");
         m.begin();
         
         Book b = s.search("one");
 
         System.out.println("isbn = " + b.getIsbn());
 
-        //Cart cart = s.newCart();
+        Cart cart = s.newCart();
 
-        //System.out.println("Add: " + cart.add(b));
-        //System.out.println("Buy: " + cart.buy());
+        System.out.println("Add: " + cart.add(b));
+        System.out.println("Buy: " + cart.buy());
 
         m.commit();
+        System.out.println("End.");
         /**
          *
          * m.commit();

@@ -68,7 +68,6 @@ public class Transations {
                         .forEach(i -> cli.send(i, new Prepare("Prepare", txid)));
             });
         }).join();
-        System.out.println("ola");
         return true;
     }
 

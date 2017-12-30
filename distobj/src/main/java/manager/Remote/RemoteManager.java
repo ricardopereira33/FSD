@@ -55,7 +55,6 @@ public class RemoteManager implements Manager{
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
-        System.out.println("Recebi :D");
         ctx.set(new Context(r.txid, r.address));
     }
 
