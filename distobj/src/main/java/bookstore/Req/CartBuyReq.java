@@ -9,6 +9,8 @@ import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
+import io.atomix.catalyst.transport.Address;
+import manager.Data.Context;
 
 /**
  *
@@ -16,21 +18,29 @@ import io.atomix.catalyst.serializer.Serializer;
  */
 public class CartBuyReq implements CatalystSerializable{
     public int cartid;
-    
+    public int txid;
+    public Address address;
+
     public CartBuyReq(){ }
     
-    public CartBuyReq(int id) {
+    public CartBuyReq(int id, Context ctx) {
         this.cartid = id;
+        this.txid = ctx.getTxid();
+        this.address = ctx.getAddress();
     }
 
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
         bo.writeInt(cartid);
+        bo.writeInt(txid);
+        srlzr.writeObject(address, bo);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         cartid = bi.readInt();
+        txid = bi.readInt();
+        address = srlzr.readObject(bi);
     }
     
 }

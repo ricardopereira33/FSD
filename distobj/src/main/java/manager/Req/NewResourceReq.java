@@ -23,7 +23,7 @@ public class NewResourceReq implements CatalystSerializable {
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         bufferOutput.writeInt(txid);
         bufferOutput.writeInt(rescid);
-        serializer.writeObject(address);
+        serializer.writeObject(address,bufferOutput);
     }
 
     @Override

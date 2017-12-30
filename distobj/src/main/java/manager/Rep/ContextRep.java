@@ -8,21 +8,25 @@ import io.atomix.catalyst.transport.Address;
 import manager.Data.Context;
 
 public class ContextRep implements CatalystSerializable{
-    public Context c;
+    public int txid;
+    public Address address;
 
     public ContextRep(){}
 
-    public ContextRep(Context c){
-        this.c = c;
+    public ContextRep(int txid, Address address) {
+        this.txid = txid;
+        this.address = address;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
-       serializer.writeObject(c);
+        bufferOutput.writeInt(txid);
+        serializer.writeObject(address, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
-        c = serializer.readObject(bufferInput);
+        txid = bufferInput.readInt();
+        address = serializer.readObject(bufferInput);
     }
 }

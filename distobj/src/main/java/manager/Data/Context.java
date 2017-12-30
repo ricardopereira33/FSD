@@ -1,8 +1,12 @@
 package manager.Data;
 
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.CatalystSerializable;
+import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 
-public class Context {
+public class Context{
     private int txid;
     private Address address;
 

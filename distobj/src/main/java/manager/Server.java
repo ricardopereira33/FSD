@@ -9,8 +9,8 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 
-import manager.Data.Context;
 import manager.Data.Transations;
+import manager.Rep.CommitRep;
 import manager.Rep.ContextRep;
 import manager.Rep.NewResourceRep;
 import manager.Req.CommitReq;
@@ -25,10 +25,10 @@ import pt.haslab.ekit.Log;
 public class Server {
     
     public static void main(String[] args) throws Exception{
-        Address address = new Address(":10202");
+        Address address = new Address(":1434");
         Transport t = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
-        Transations txs = new Transations(tc, t);
+        Transations txs = new Transations();
         // log_0 is coord log
         Log l = new Log("log_manager");
         
@@ -44,9 +44,24 @@ public class Server {
             });
             l.open().thenRun(()-> { 
                 System.out.println("Entrei");
+                registMsg(tc);
                 registHandlers(address, t, tc, txs, l);
             }); 
         }).join();
+    }
+
+    private static void registMsg(ThreadContext tc){
+        tc.serializer().register(Abort.class);
+        tc.serializer().register(Commit.class);
+        tc.serializer().register(Ok.class);
+        tc.serializer().register(Prepare.class);
+        tc.serializer().register(Rollback.class);
+        tc.serializer().register(ContextReq.class);
+        tc.serializer().register(ContextRep.class);
+        tc.serializer().register(NewResourceReq.class);
+        tc.serializer().register(NewResourceRep.class);
+        tc.serializer().register(CommitReq.class);
+        tc.serializer().register(CommitRep.class);
     }
 
     private static void registHandlers(Address address, Transport t, ThreadContext tc, Transations txs, Log l) {
@@ -54,35 +69,28 @@ public class Server {
             t.server().listen(address, (c) -> {
                 c.handler(ContextReq.class, (m) -> {
                     // new Transation
-                    int txid = txs.newTransation();
-                    Context con = new Context(txid, address);
-                    return Futures.completedFuture(new ContextRep(con));
+                    System.out.println("Recebi um begin.");
+                    int txid = txs.newTransation(address);
+                    return Futures.completedFuture(new ContextRep(txid, address));
                 });
                 c.handler(NewResourceReq.class, (m) -> {
                     // add resource in the Transation
+                    System.out.println("Novo user :D");
                     txs.addResource(m.txid, m.address, m.rescid);
-                    return Futures.completedFuture(new NewResourceRep());
+                    System.out.println("Inscrito");
+                    return Futures.completedFuture(new NewResourceRep(true));
                 });
                 c.handler(CommitReq.class, (m) -> {
                     // end Transation
-                    try{ txs.start2PC(m.c.getTxid());}
+                    System.out.println("Fim :(.");
+                    try{ txs.start2PC(m.txid, address);}
                     catch(Exception e){
                         System.out.println("Erro: " + e.getMessage());
                     }
-                });
-                c.handler(Commit.class, (m)-> {
-                    System.out.println("Commit");
-                    l.append(m);
-                });
-                c.handler(Ok.class, (m)->{
-                    System.out.println("Ok");
-                    try{txs.checkTransation(m.txid);}
-                    catch(Exception e){
-                        System.out.println("Erro: "+ e.getMessage());
-                    }
+                    return Futures.completedFuture(new CommitRep(true));
                 });
                 c.onException(e->{
-                    System.out.println("Erro: "+ e.getMessage() +". :(");
+                    System.out.println("Erro: "+ e.getMessage() +".");
                 });
             });
         });

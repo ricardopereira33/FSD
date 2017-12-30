@@ -1,39 +1,35 @@
 package manager.Data;
 
-import bank.Impl.Transfer;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
-import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
-import log.Abort;
-import log.Commit;
-import log.Prepare;
+import log.*;
+import pt.haslab.ekit.Clique;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.IntStream;
 
 public class Transations {
     private Map<Integer, Transation> trans;
     private int count;
-    private boolean valid;
     private ThreadContext tc;
     private Transport tran;
 
-    public Transations(ThreadContext tc, Transport tran) {
+    public Transations() {
         this.trans = new HashMap<>();
         this.count = 1;
-        this.tc = tc;
-        this.tran = tran;
-        this.valid = true;
+        this.tc = new SingleThreadContext("proto-%d", new Serializer());
+        this.tran = new NettyTransport();
     }
 
-    public int newTransation(){
-        Transation t = new Transation(count);
+    public int newTransation(Address addrs){
+        Transation t = new Transation(count, addrs);
+        trans.put(count,t);
         count++;
         return count-1;
     }
@@ -43,16 +39,36 @@ public class Transations {
         t.addAddress(rescid, address);
     }
 
-    public boolean start2PC(int txid) throws ExecutionException, InterruptedException {
+    public boolean start2PC(int txid, Address ad) {
         Transation t = trans.get(txid);
         List<Address> list = t.getAddress();
-        Connection c = null;
+        Address[] add = list.toArray(new Address[list.size()]);
 
-        for(Address a: list){
-            tc.execute(() -> tran.client().connect(a))
-                    .join().get()
-                    .send(new Prepare("Prepare", txid));
-        }
+        Clique cli = new Clique(tran,0,add);
+
+        System.out.println("1: " + add[0]);
+        System.out.println("2: " + add[1]);
+
+        tc.execute(() -> {
+            cli.handler(Commit.class, (s, m) -> {
+                System.out.println("com");
+            });
+            cli.handler(Abort.class, (s, m) -> {
+                System.out.println("Abort");
+                Transation tt = trans.get(txid);
+                tt.setValid(false);
+            });
+            cli.handler(Ok.class, (s, m) -> {
+                System.out.println("Ok");
+                checkTransation(txid, cli, add.length);
+            });
+            cli.open().thenRun(() -> {
+                System.out.println("open");
+                IntStream.range(0, add.length)
+                        .forEach(i -> cli.send(i, new Prepare("Prepare", txid)));
+            });
+        }).join();
+        System.out.println("ola");
         return true;
     }
 
@@ -61,22 +77,16 @@ public class Transations {
         return t.getSize();
     }
 
-    public void checkTransation(int txid) throws ExecutionException, InterruptedException {
+    public void checkTransation(int txid, Clique cli, int size){
         Transation t = trans.get(txid);
-
         if(t.arrived()){
-            List<Address> list = t.getAddress();
-            for(Address a: list){
-                if(valid){
-                    tc.execute(() -> tran.client().connect(a))
-                            .join().get()
-                            .send(new Commit("Commit"));
-                }
-                else{
-                    tc.execute(() -> tran.client().connect(a))
-                            .join().get()
-                            .send(new Abort("Abort"));
-                }
+            if(!t.isValid()){
+                IntStream.range(1, size)
+                        .forEach(i -> cli.send(i, new Rollback("Rollback")));
+            }
+            else{
+                IntStream.range(1, size)
+                        .forEach(i -> cli.send(i, new Commit("Commit")));
             }
         }
     }

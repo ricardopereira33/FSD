@@ -16,6 +16,8 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import manager.Data.Context;
+import manager.Remote.RemoteManager;
 
 public class RemoteStore implements Store {
     private final ThreadContext tc;
@@ -44,6 +46,7 @@ public class RemoteStore implements Store {
         tc.serializer().register(StoreMakeCartRep.class);
         tc.serializer().register(StoreMakeCartReq.class);
         tc.serializer().register(ObjRef.class);
+        tc.serializer().register(Address.class);
     }
 
     @Override
@@ -53,8 +56,9 @@ public class RemoteStore implements Store {
 
     @Override
     public Book search(String title) throws Exception {
+        Context ctx = RemoteManager.ctx.get();
         StoreSearchRep r = (StoreSearchRep) tc.execute(() ->
-                c.sendAndReceive(new StoreSearchReq(title, id))
+                c.sendAndReceive(new StoreSearchReq(title, id, ctx))
         ).join().get();
 
         return u.makeBook(r.ref);
@@ -62,8 +66,9 @@ public class RemoteStore implements Store {
 
     @Override
     public Cart newCart() throws Exception {
+        Context ctx = RemoteManager.ctx.get();
         StoreMakeCartRep r = (StoreMakeCartRep) tc.execute(() ->
-                c.sendAndReceive(new StoreMakeCartReq(id))
+                c.sendAndReceive(new StoreMakeCartReq(id, ctx))
         ).join().get();
         
         return u.makeCart(r.ref);

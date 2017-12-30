@@ -15,6 +15,8 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import manager.Data.Context;
+import manager.Remote.RemoteManager;
 
 public class RemoteCart implements Cart{
     private final ThreadContext tc;
@@ -46,9 +48,10 @@ public class RemoteCart implements Cart{
     @Override
     public boolean add(Book b) {
         CartAddRep r = null;
+        Context ctx = RemoteManager.ctx.get();
         try {
             r = (CartAddRep) tc.execute(() ->
-                    c.sendAndReceive(new CartAddReq(id, b.getIsbn()))
+                    c.sendAndReceive(new CartAddReq(id, b.getIsbn(), ctx))
             ).join().get();
             
             return r.ok;
@@ -62,9 +65,10 @@ public class RemoteCart implements Cart{
     @Override
     public int buy() {
         CartBuyRep r = null;
+        Context ctx = RemoteManager.ctx.get();
         try {
             r = (CartBuyRep) tc.execute(() ->
-                    c.sendAndReceive(new CartBuyReq(id))
+                    c.sendAndReceive(new CartBuyReq(id, ctx))
             ).join().get();
             
             return r.price;
