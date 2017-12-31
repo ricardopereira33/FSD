@@ -22,12 +22,14 @@ public class RemoteManager implements Manager{
     private final Connection c;
     private final ThreadContext tc;
     private final Address address;
+    private int id;
     public static ThreadLocal<Context> ctx = new ThreadLocal<Context>();
 
     public RemoteManager(int id, Address address) throws ExecutionException, InterruptedException {
         Transport t = new NettyTransport();
         tc = new SingleThreadContext("srv-%d", new Serializer());
         this.address = address;
+        this.id = id;
         registeMsg();
 
         c = tc.execute(() ->
@@ -44,13 +46,12 @@ public class RemoteManager implements Manager{
         tc.serializer().register(NewResourceReq.class);
     }
 
-
     @Override
     public void begin() {
         ContextRep r = null;
         try {
             r = (ContextRep) tc.execute(() ->
-                    c.sendAndReceive(new ContextReq())
+                    c.sendAndReceive(new ContextReq(id))
             ).join().get();
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -64,7 +65,7 @@ public class RemoteManager implements Manager{
         Context con = ctx.get();
         try {
             r = (CommitRep) tc.execute(() ->
-                    c.sendAndReceive(new CommitReq(con))
+                    c.sendAndReceive(new CommitReq(con, id))
             ).join().get();
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());

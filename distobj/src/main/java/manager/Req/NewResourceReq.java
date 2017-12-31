@@ -8,28 +8,28 @@ import io.atomix.catalyst.transport.Address;
 
 public class NewResourceReq implements CatalystSerializable {
     public int txid;
-    public int rescid;
+    public int managerid;
     public Address address;
 
     public NewResourceReq() {}
 
-    public NewResourceReq(int txid, int rescid, Address address) {
+    public NewResourceReq(int txid, int id, Address address) {
         this.txid = txid;
-        this.rescid = rescid;
+        this.managerid = id;
         this.address = address;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         bufferOutput.writeInt(txid);
-        bufferOutput.writeInt(rescid);
+        bufferOutput.writeInt(managerid);
         serializer.writeObject(address,bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         txid = bufferInput.readInt();
-        rescid = bufferInput.readInt();
+        managerid = bufferInput.readInt();
         address = serializer.readObject(bufferInput);
     }
 }

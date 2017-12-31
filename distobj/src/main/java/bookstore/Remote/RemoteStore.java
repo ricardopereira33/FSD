@@ -1,7 +1,7 @@
 package bookstore.Remote;
 
-import bookstore.Data.Util;
-import bookstore.Data.ObjRef;
+import DO.Util;
+import DO.ObjRef;
 import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;

@@ -11,6 +11,7 @@ import java.util.Map;
 public class Transation {
     private int id;
     private int regist;
+    private int idRes;
     private Map<Integer, Address> address;
     private boolean valid;
 
@@ -21,11 +22,15 @@ public class Transation {
         this.address.put(regist, new Address(addrs.host()+":"+(addrs.port()+1)));
         regist++;
         this.valid = true;
+        this.idRes = 0;
     }
 
-    public void addAddress(int rescid, Address address){
-        if(!this.address.containsKey(rescid))
-            this.address.put(rescid, new Address(address.host()+":"+(address.port()+1)));
+    public int addAddress(int id, Address address){
+        if(!this.address.containsKey(id)){
+            this.address.put(id, new Address(address.host()+":"+(address.port()+1)));
+            idRes++;
+        }
+        return idRes;
     }
 
     public List<Address> getAddress(){

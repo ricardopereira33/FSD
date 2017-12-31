@@ -3,17 +3,7 @@ package bank.Remote;
 import bank.Interfaces.Bank;
 import bank.Rep.TransferRep;
 import bank.Req.TransferReq;
-import bookstore.Data.ObjRef;
-import bookstore.Data.Util;
-import bookstore.Interfaces.Book;
-import bookstore.Interfaces.Cart;
-import bookstore.Interfaces.Store;
-import bookstore.Rep.CartAddRep;
-import bookstore.Rep.StoreMakeCartRep;
-import bookstore.Rep.StoreSearchRep;
-import bookstore.Req.CartAddReq;
-import bookstore.Req.StoreMakeCartReq;
-import bookstore.Req.StoreSearchReq;
+import DO.Util;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
@@ -21,6 +11,8 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import manager.Data.Context;
+import manager.Remote.RemoteManager;
 
 public class RemoteBank implements Bank {
     private final ThreadContext tc;
@@ -51,9 +43,10 @@ public class RemoteBank implements Bank {
     @Override
     public boolean transfer(String recv, String send, int value) {
         TransferRep r = null;
+        Context ctx = RemoteManager.ctx.get();
         try {
             r = (TransferRep) tc.execute(() ->
-                    c.sendAndReceive(new TransferReq(recv, send, value, id))
+                    c.sendAndReceive(new TransferReq(recv, send, value, id,ctx))
             ).join().get();
 
             return r.ok;

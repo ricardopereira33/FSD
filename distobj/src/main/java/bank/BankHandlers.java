@@ -1,20 +1,11 @@
-package bookstore;
+package bank;
 
 import DO.DO;
-import bookstore.Data.Data;
 import DO.ObjRef;
-import bookstore.Impl.StoreImp;
-import bookstore.Interfaces.Book;
-import bookstore.Interfaces.Cart;
-import bookstore.Interfaces.Store;
-import bookstore.Rep.CartAddRep;
-import bookstore.Rep.CartBuyRep;
-import bookstore.Rep.StoreMakeCartRep;
-import bookstore.Rep.StoreSearchRep;
-import bookstore.Req.CartAddReq;
-import bookstore.Req.CartBuyReq;
-import bookstore.Req.StoreMakeCartReq;
-import bookstore.Req.StoreSearchReq;
+import bank.Impl.BankImp;
+import bank.Interfaces.Bank;
+import bank.Rep.TransferRep;
+import bank.Req.TransferReq;
 import io.atomix.catalyst.concurrent.Futures;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
@@ -30,7 +21,7 @@ import manager.Req.NewResourceReq;
 import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
-public class StoreHandlers {
+public class BankHandlers {
     private Transport t;
     private SingleThreadContext tc;
     private Address address;
@@ -41,13 +32,13 @@ public class StoreHandlers {
     private Connection conManager;
     private Clique cli;
 
-    public StoreHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
+    public BankHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
         this.t = t;
         this.tc = tc;
         this.address = address;
         this.d = d;
         this.log = log;
-        this.id = 1;
+        this.id = 2;
         this.tcManager = null;
         this.conManager = null;
         this.cli = null;
@@ -71,29 +62,20 @@ public class StoreHandlers {
             log.handler(Abort.class, (sender, msg)->{
                 System.out.println("Log: Abort");
             });
-            log.handler(Data.class, (sender, msg) -> {
-                System.out.println("Data");
-            });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
-                Store s = new StoreImp();
-                d.oExport(s);
+                Bank b = new BankImp();
+                d.oExport(b);
 
                 // Save initial store
-                log.append(s);
+                log.append(b);
             });
         });
     }
 
     private void registMsg(){
-        tc.serializer().register(StoreSearchReq.class);
-        tc.serializer().register(StoreSearchRep.class);
-        tc.serializer().register(StoreMakeCartRep.class);
-        tc.serializer().register(StoreMakeCartReq.class);
-        tc.serializer().register(CartAddReq.class);
-        tc.serializer().register(CartAddRep.class);
-        tc.serializer().register(CartBuyReq.class);
-        tc.serializer().register(CartBuyRep.class);
+        tc.serializer().register(TransferRep.class);
+        tc.serializer().register(TransferReq.class);
         tc.serializer().register(ObjRef.class);
         tc.serializer().register(Abort.class);
         tc.serializer().register(Commit.class);
@@ -108,47 +90,13 @@ public class StoreHandlers {
     private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
-                c.handler(StoreSearchReq.class, (m) -> {
-                    Store s = (Store) d.getElement(m.storeid);
-                    Book b = null;
-                    try{
-                        b = s.search(m.title);
-                        registInManager(new Context(m.txid, m.address));
-                    }
-                    catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
-                    ObjRef ref = d.oExport(b);
-                    return Futures.completedFuture(new StoreSearchRep(ref));
-                });
-                c.handler(StoreMakeCartReq.class, (m) -> {
-                    Store s = (Store) d.getElement(m.storeid);
-                    Cart cart = null;
-                    try{
-                        cart = s.newCart();
-                        registInManager(new Context(m.txid, m.address));
-                    }
-                    catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
-                    ObjRef ref = d.oExport(cart);
+                c.handler(TransferReq.class, (m) -> {
+                    Bank b = (Bank) d.getElement(m.bankid);
+                    boolean res = b.transfer(m.recv, m.send, m.value);
+                    try{ registInManager(new Context(m.txid, m.address));}
+                    catch(Exception e){ System.out.println("Erro: "+ e.getMessage());}
 
-                    return Futures.completedFuture(new StoreMakeCartRep(ref));
-                });
-                c.handler(CartAddReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
-                    Book b = (Book) d.getElement(m.isbn);
-                    try {
-                        registInManager(new Context(m.txid, m.address));
-                    }
-                    catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
-
-                    return Futures.completedFuture(new CartAddRep(cart.add(b)));
-                });
-                c.handler(CartBuyReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
-                    try {
-                        registInManager(new Context(m.txid, m.address));
-                    }
-                    catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
-
-                    return Futures.completedFuture(new CartBuyRep(true, cart.buy()));
+                    return Futures.completedFuture(new TransferRep(res));
                 });
             });
         });

@@ -7,17 +7,20 @@ import bookstore.Interfaces.Store;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class StoreImp implements Store {
     
     public Map<Integer, BookImp> books;
     public Map<Integer, BookImp> history;
+    public ReentrantLock lock;
 
     public StoreImp() {
         books = new HashMap<>();
         history = new HashMap<>();
         books.put(1, new BookImp(1, "one", "someone", 10));
         books.put(2, new BookImp(2, "other", "someother", 20));
+        lock = new ReentrantLock();
     }
 
     @Override

@@ -1,12 +1,11 @@
 import bank.Interfaces.Bank;
-import bookstore.Data.ObjRef;
+import DO.ObjRef;
+import DO.DO;
 import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
-import bookstore.DO;
 import io.atomix.catalyst.transport.Address;
 import manager.Interfaces.Manager;
-import manager.Remote.RemoteManager;
 
 public class Client {
     public static void main(String[] args) throws Exception {
@@ -18,23 +17,15 @@ public class Client {
         Address managerAddress= new Address("127.0.0.1:1434");
 
         // Get Stubs for Store, Bank and Manager
-        //Store s =  (Store) d.oImport(new ObjRef(storeAddress,1,"Store"));
+        Store s =  (Store) d.oImport(new ObjRef(storeAddress,1,"Store"));
         Bank bank = (Bank) d.oImport(new ObjRef(bankAddress, 1, "Bank"));
-        //Manager m = (Manager) d.oImport(new ObjRef(managerAddress, 1, "Manager"));
+        Manager m = (Manager) d.oImport(new ObjRef(managerAddress, 1, "Manager"));
 
+        /** Transation **/
 
-        bank.transfer("store", "client", 20);
-
-
-        /**
-         * Manager m = ....;
-         *
-         *
-         * m.begin();
-         *
         System.out.println("Begin.");
         m.begin();
-        
+
         Book b = s.search("one");
 
         System.out.println("isbn = " + b.getIsbn());
@@ -44,11 +35,10 @@ public class Client {
         System.out.println("Add: " + cart.add(b));
         System.out.println("Buy: " + cart.buy());
 
+        bank.transfer("store", "client", 20);
+
         m.commit();
-        System.out.println("End.");*/
-        /**
-         *
-         * m.commit();
-         * */
+        System.out.println("End.");
+
     }
 }

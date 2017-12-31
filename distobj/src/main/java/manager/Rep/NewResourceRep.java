@@ -8,19 +8,24 @@ import manager.Req.NewResourceReq;
 
 public class NewResourceRep implements CatalystSerializable {
     public boolean ok;
+    public int idRes;
 
     public NewResourceRep(){}
 
-    public NewResourceRep(boolean ok){ this.ok = ok;}
-
+    public NewResourceRep(boolean ok, int idRes){
+        this.ok = ok;
+        this.idRes = idRes;
+    }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         bufferOutput.writeBoolean(ok);
+        bufferOutput.writeInt(idRes);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         ok = bufferInput.readBoolean();
+        idRes = bufferInput.readInt();
     }
 }

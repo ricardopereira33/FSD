@@ -9,24 +9,28 @@ import manager.Data.Context;
 
 public class CommitReq implements CatalystSerializable {
     public int txid;
+    public int managerid;
     public Address address;
 
     public CommitReq(){}
 
-    public CommitReq(Context context) {
+    public CommitReq(Context context, int id) {
         this.txid = context.getTxid();
+        this.managerid = id;
         this.address = context.getAddress();
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         bufferOutput.writeInt(txid);
+        bufferOutput.writeInt(managerid);
         serializer.writeObject(address, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         txid = bufferInput.readInt();
+        managerid = bufferInput.readInt();
         address = serializer.readObject(bufferInput);
     }
 }

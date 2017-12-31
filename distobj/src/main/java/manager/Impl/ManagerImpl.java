@@ -8,6 +8,7 @@ import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import log.*;
 import manager.Data.Transation;
+import manager.Interfaces.Manager;
 import pt.haslab.ekit.Clique;
 
 import java.util.HashMap;
@@ -15,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class Transations {
+public class ManagerImpl{
     private Map<Integer, Transation> trans;
     private int count;
     private ThreadContext tc;
     private Transport tran;
 
-    public Transations() {
+    public ManagerImpl() {
         this.trans = new HashMap<>();
         this.count = 1;
         this.tc = new SingleThreadContext("proto-%d", new Serializer());
@@ -35,9 +36,9 @@ public class Transations {
         return count-1;
     }
 
-    public void addResource(int txid, Address address, int rescid){
+    public int addResource(int txid, Address address){
         Transation t = trans.get(txid);
-        t.addAddress(rescid, address);
+        return t.addAddress(address.port(), address);
     }
 
     public boolean start2PC(int txid, Address ad) {
@@ -49,6 +50,7 @@ public class Transations {
 
         System.out.println("1: " + add[0]);
         System.out.println("2: " + add[1]);
+        System.out.println("3: " + add[2]);
 
         tc.execute(() -> {
             cli.handler(Commit.class, (s, m) -> {
@@ -70,11 +72,6 @@ public class Transations {
             });
         }).join();
         return true;
-    }
-
-    public int getSize(int txid) {
-        Transation t = trans.get(txid);
-        return t.getSize();
     }
 
     public void checkTransation(int txid, Clique cli, int size){

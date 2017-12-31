@@ -1,6 +1,5 @@
 package bank.Rep;
 
-import bookstore.Data.ObjRef;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
