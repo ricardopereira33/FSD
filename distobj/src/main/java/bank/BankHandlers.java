@@ -171,7 +171,8 @@ public class BankHandlers {
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
                 b.unlock();
-                //rollback();
+                update();
+                this.backup = null;
             });
             cli.open().thenRun(() ->{
                 System.out.println("2PC begin.");

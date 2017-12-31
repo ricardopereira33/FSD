@@ -222,7 +222,8 @@ public class StoreHandlers {
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
                 si.unlock();
-                //rollback();
+                update();
+                this.backup = null;
             });
             cli.open().thenRun(() ->{
                 System.out.println("2PC begin.");

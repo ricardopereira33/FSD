@@ -15,34 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Client.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Client.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/Client.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="360">
               <caret line="31" column="32" lean-forward="false" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="StoreHandlers.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-621">
-              <caret line="106" column="75" lean-forward="false" selection-start-line="106" selection-start-column="75" selection-end-line="106" selection-end-column="75" />
-              <folding>
-                <element signature="method#update#0;class#StoreHandlers#0" expanded="false" />
-                <element signature="method#registMsg#0;class#StoreHandlers#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ManagerImpl.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="22" column="29" lean-forward="true" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -114,9 +91,9 @@
         <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/BackupStore.java" />
         <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/Backup.java" />
         <option value="$PROJECT_DIR$/src/main/java/DO/Backup.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bank/BankHandlers.java" />
         <option value="$PROJECT_DIR$/src/main/java/bookstore/Server.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bank/BankHandlers.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java" />
       </list>
     </option>
   </component>
@@ -482,12 +459,12 @@
       <workItem from="1514570993362" duration="14615000" />
       <workItem from="1514631216902" duration="693000" />
       <workItem from="1514632388709" duration="6738000" />
-      <workItem from="1514722438633" duration="18142000" />
+      <workItem from="1514722438633" duration="18345000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="93269000" />
+    <option name="totallyTimeSpent" value="93472000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -500,7 +477,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.49361023" order="7" side_tool="false" content_ui="tabs" />
@@ -889,14 +865,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Client.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="31" column="32" lean-forward="false" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/manager/Server.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="450">
@@ -912,17 +880,6 @@
         <state relative-caret-position="630">
           <caret line="50" column="5" lean-forward="false" selection-start-line="50" selection-start-column="5" selection-end-line="50" selection-end-column="5" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bank/BankHandlers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="192" column="35" lean-forward="true" selection-start-line="192" selection-start-column="35" selection-end-line="192" selection-end-column="35" />
-          <folding>
-            <element signature="method#update#0;class#BankHandlers#0" expanded="false" />
-            <element signature="method#registMsg#0;class#BankHandlers#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -955,12 +912,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-621">
-          <caret line="106" column="75" lean-forward="false" selection-start-line="106" selection-start-column="75" selection-end-line="106" selection-end-column="75" />
+        <state relative-caret-position="660">
+          <caret line="224" column="25" lean-forward="false" selection-start-line="224" selection-start-column="25" selection-end-line="224" selection-end-column="25" />
           <folding>
             <element signature="method#update#0;class#StoreHandlers#0" expanded="false" />
             <element signature="method#registMsg#0;class#StoreHandlers#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bank/BankHandlers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="173" column="25" lean-forward="false" selection-start-line="173" selection-start-column="25" selection-end-line="173" selection-end-column="25" />
+          <folding>
+            <element signature="method#update#0;class#BankHandlers#0" expanded="false" />
+            <element signature="method#registMsg#0;class#BankHandlers#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="31" column="32" lean-forward="false" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
+          <folding />
         </state>
       </provider>
     </entry>
