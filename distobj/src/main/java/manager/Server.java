@@ -45,7 +45,7 @@ public class Server {
             });
             l.open().thenRun(()-> { 
                 System.out.println("Server running... ");
-                ManagerImpl txs = new ManagerImpl();
+                ManagerImpl txs = new ManagerImpl(l);
                 d.oExport(txs);
 
                 registMsg(tc);
@@ -75,13 +75,14 @@ public class Server {
                     // new Transation
                     ManagerImpl txs = (ManagerImpl) d.getElement(m.managerid);
                     int txid = txs.newTransation(address);
+
                     return Futures.completedFuture(new ContextRep(txid, address));
                 });
                 c.handler(NewResourceReq.class, (m) -> {
                     // add resource in the Transation
                     ManagerImpl txs = (ManagerImpl) d.getElement(m.managerid);
                     int idRes = txs.addResource(m.txid, m.address);
-                    System.out.println("Inscrito");
+
                     return Futures.completedFuture(new NewResourceRep(true, idRes));
                 });
                 c.handler(CommitReq.class, (m) -> {
@@ -91,6 +92,7 @@ public class Server {
                     catch(Exception e){
                         System.out.println("Erro: " + e.getMessage());
                     }
+
                     return Futures.completedFuture(new CommitRep(true));
                 });
                 c.onException(e->{

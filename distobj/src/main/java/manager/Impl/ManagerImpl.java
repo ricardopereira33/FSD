@@ -10,6 +10,7 @@ import log.*;
 import manager.Data.Transation;
 import manager.Interfaces.Manager;
 import pt.haslab.ekit.Clique;
+import pt.haslab.ekit.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,12 +22,14 @@ public class ManagerImpl{
     private int count;
     private ThreadContext tc;
     private Transport tran;
+    private Log log;
 
-    public ManagerImpl() {
+    public ManagerImpl(Log log) {
         this.trans = new HashMap<>();
         this.count = 1;
         this.tc = new SingleThreadContext("proto-%d", new Serializer());
         this.tran = new NettyTransport();
+        this.log = log;
     }
 
     public int newTransation(Address addrs){
@@ -55,11 +58,13 @@ public class ManagerImpl{
         tc.execute(() -> {
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("com");
+                log.append(m);
             });
             cli.handler(Abort.class, (s, m) -> {
                 System.out.println("Abort");
                 Transation tt = trans.get(txid);
                 tt.setValid(false);
+                log.append(m);
             });
             cli.handler(Ok.class, (s, m) -> {
                 System.out.println("Ok");

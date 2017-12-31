@@ -27,11 +27,9 @@ public class Client {
         m.begin();
 
         Book b = s.search("one");
-
         System.out.println("isbn = " + b.getIsbn());
 
         Cart cart = s.newCart();
-
         System.out.println("Add: " + cart.add(b));
         int value = cart.buy();
         System.out.println("Buy: " + value);
