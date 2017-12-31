@@ -2,6 +2,7 @@ package bank;
 
 import DO.DO;
 import DO.ObjRef;
+import DO.Backup;
 import bank.Impl.BankImp;
 import bank.Interfaces.Bank;
 import bank.Rep.TransferRep;
@@ -23,14 +24,15 @@ import pt.haslab.ekit.Log;
 
 public class BankHandlers {
     private Transport t;
-    private SingleThreadContext tc;
+    private ThreadContext tc;
     private Address address;
     private DO d;
     private Log log;
     private int id;
-    private SingleThreadContext tcManager;
+    private ThreadContext tcManager;
     private Connection conManager;
     private Clique cli;
+    private Backup backup;
 
     public BankHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
         this.t = t;
@@ -42,6 +44,7 @@ public class BankHandlers {
         this.tcManager = null;
         this.conManager = null;
         this.cli = null;
+        this.backup = null;
     }
 
     public void exe(){
@@ -58,33 +61,31 @@ public class BankHandlers {
             });
             log.handler(Commit.class, (sender, msg)-> {
                 System.out.println("Log: Commit");
+                update();
             });
             log.handler(Abort.class, (sender, msg)->{
                 System.out.println("Log: Abort");
+                this.backup = null;
+            });
+            log.handler(Backup.class, (sender, msg) -> {
+                System.out.println("Backup");
+                this.backup = msg;
             });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
                 Bank b = new BankImp();
                 d.oExport(b);
-
-                // Save initial store
-                log.append(b);
             });
         });
     }
 
-    private void registMsg(){
-        tc.serializer().register(TransferRep.class);
-        tc.serializer().register(TransferReq.class);
-        tc.serializer().register(ObjRef.class);
-        tc.serializer().register(Abort.class);
-        tc.serializer().register(Commit.class);
-        tc.serializer().register(Ok.class);
-        tc.serializer().register(Prepare.class);
-        tc.serializer().register(Rollback.class);
-        tc.serializer().register(Address.class);
-        tc.serializer().register(NewResourceRep.class);
-        tc.serializer().register(NewResourceReq.class);
+    private void update() {
+        this.d = this.backup.getD();
+        this.id = this.backup.getId();
+        this.tcManager = this.backup.getTc();
+        this.conManager = this.backup.getC();
+        this.cli = this.backup.getCli();
+        this.backup = null;
     }
 
     private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
@@ -93,7 +94,10 @@ public class BankHandlers {
                 c.handler(TransferReq.class, (m) -> {
                     BankImp b = (BankImp) d.getElement(m.bankid);
                     boolean res = b.transfer(m.recv, m.send, m.value);
-                    try{ registInManager(new Context(m.txid, m.address), b);}
+                    try{
+                        registInManager(new Context(m.txid, m.address), b);
+                        registLog();
+                    }
                     catch(Exception e){ System.out.println("Erro: "+ e.getMessage());}
 
                     return Futures.completedFuture(new TransferRep(res));
@@ -125,6 +129,25 @@ public class BankHandlers {
         }
         b.lock();
         this.id = r.idRes;
+    }
+
+    private void registMsg(){
+        tc.serializer().register(TransferRep.class);
+        tc.serializer().register(TransferReq.class);
+        tc.serializer().register(ObjRef.class);
+        tc.serializer().register(Abort.class);
+        tc.serializer().register(Commit.class);
+        tc.serializer().register(Ok.class);
+        tc.serializer().register(Prepare.class);
+        tc.serializer().register(Rollback.class);
+        tc.serializer().register(Address.class);
+        tc.serializer().register(NewResourceRep.class);
+        tc.serializer().register(NewResourceReq.class);
+    }
+
+    private void registLog() {
+        Backup b = new Backup(d, tcManager, conManager, cli, id);
+        log.append(b);
     }
 
     private void createClique(Address address, BankImp b) {

@@ -1,7 +1,7 @@
 package bookstore;
 
 import DO.DO;
-import bookstore.Data.Data;
+import DO.Backup;
 import DO.ObjRef;
 import bookstore.Impl.StoreImp;
 import bookstore.Interfaces.Book;
@@ -32,14 +32,15 @@ import pt.haslab.ekit.Log;
 
 public class StoreHandlers {
     private Transport t;
-    private SingleThreadContext tc;
+    private ThreadContext tc;
     private Address address;
     private DO d;
     private Log log;
     private int id;
-    private SingleThreadContext tcManager;
+    private ThreadContext tcManager;
     private Connection conManager;
     private Clique cli;
+    private Backup backup;
 
     public StoreHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
         this.t = t;
@@ -51,6 +52,7 @@ public class StoreHandlers {
         this.tcManager = null;
         this.conManager = null;
         this.cli = null;
+        this.backup = null;
     }
 
     public void exe(){
@@ -67,20 +69,83 @@ public class StoreHandlers {
             });
             log.handler(Commit.class, (sender, msg)-> {
                 System.out.println("Log: Commit");
+                update();
             });
             log.handler(Abort.class, (sender, msg)->{
                 System.out.println("Log: Abort");
+                this.backup = null;
             });
-            log.handler(Data.class, (sender, msg) -> {
-                System.out.println("Data");
+            log.handler(Backup.class, (sender, msg) -> {
+                System.out.println("Backup");
+                this.backup = msg;
             });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
                 Store s = new StoreImp();
                 d.oExport(s);
+            });
+        });
+    }
 
-                // Save initial store
-                log.append(s);
+    private void update() {
+        this.d = this.backup.getD();
+        this.id = this.backup.getId();
+        this.tcManager = this.backup.getTc();
+        this.conManager = this.backup.getC();
+        this.cli = this.backup.getCli();
+        this.backup = null;
+    }
+
+    private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
+        tc.execute( () -> {
+            t.server().listen(address, (c) -> {
+                c.handler(StoreSearchReq.class, (m) -> {
+                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    Book b = null;
+                    try{
+                        b = s.search(m.title);
+                        registInManager(new Context(m.txid, m.address), s);
+                    }
+                    catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
+                    ObjRef ref = d.oExport(b);
+                    registLog();
+
+                    return Futures.completedFuture(new StoreSearchRep(ref));
+                });
+                c.handler(StoreMakeCartReq.class, (m) -> {
+                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    Cart cart = null;
+                    try{
+                        cart = s.newCart();
+                        registInManager(new Context(m.txid, m.address), s);
+                    }
+                    catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
+                    ObjRef ref = d.oExport(cart);
+                    registLog();
+
+                    return Futures.completedFuture(new StoreMakeCartRep(ref));
+                });
+                c.handler(CartAddReq.class, (m) -> {
+                    Cart cart = (Cart) d.getElement(m.cartid);
+                    Book b = (Book) d.getElement(m.isbn);
+                    try {
+                        registInManager(new Context(m.txid, m.address), null);
+                        registLog();
+                    }
+                    catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
+
+                    return Futures.completedFuture(new CartAddRep(cart.add(b)));
+                });
+                c.handler(CartBuyReq.class, (m) -> {
+                    Cart cart = (Cart) d.getElement(m.cartid);
+                    try {
+                        registInManager(new Context(m.txid, m.address), null);
+                        registLog();
+                    }
+                    catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
+
+                    return Futures.completedFuture(new CartBuyRep(true, cart.buy()));
+                });
             });
         });
     }
@@ -105,53 +170,9 @@ public class StoreHandlers {
         tc.serializer().register(NewResourceReq.class);
     }
 
-    private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
-        tc.execute( () -> {
-            t.server().listen(address, (c) -> {
-                c.handler(StoreSearchReq.class, (m) -> {
-                    StoreImp s = (StoreImp) d.getElement(m.storeid);
-                    Book b = null;
-                    try{
-                        b = s.search(m.title);
-                        registInManager(new Context(m.txid, m.address), s);
-                    }
-                    catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
-                    ObjRef ref = d.oExport(b);
-                    return Futures.completedFuture(new StoreSearchRep(ref));
-                });
-                c.handler(StoreMakeCartReq.class, (m) -> {
-                    StoreImp s = (StoreImp) d.getElement(m.storeid);
-                    Cart cart = null;
-                    try{
-                        cart = s.newCart();
-                        registInManager(new Context(m.txid, m.address), s);
-                    }
-                    catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
-                    ObjRef ref = d.oExport(cart);
-
-                    return Futures.completedFuture(new StoreMakeCartRep(ref));
-                });
-                c.handler(CartAddReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
-                    Book b = (Book) d.getElement(m.isbn);
-                    try {
-                        registInManager(new Context(m.txid, m.address), null);
-                    }
-                    catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
-
-                    return Futures.completedFuture(new CartAddRep(cart.add(b)));
-                });
-                c.handler(CartBuyReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
-                    try {
-                        registInManager(new Context(m.txid, m.address), null);
-                    }
-                    catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
-
-                    return Futures.completedFuture(new CartBuyRep(true, cart.buy()));
-                });
-            });
-        });
+    private void registLog() {
+        Backup b = new Backup(d, tcManager, conManager, cli, id);
+        log.append(b);
     }
 
     private void registInManager(Context ctx, StoreImp s) throws Exception {

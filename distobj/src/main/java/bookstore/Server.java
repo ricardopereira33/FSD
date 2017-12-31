@@ -18,8 +18,8 @@ public class Server {
         DO d = new DO(new Address("127.0.0.1:1235"));
         Log log = new Log("log_bookstore");
 
-        StoreHandlers sh = new StoreHandlers(t, tc, address, d, log);
         // Regist Messages and Handlers
+        StoreHandlers sh = new StoreHandlers(t, tc, address, d, log);
         sh.exe();
     }
 }

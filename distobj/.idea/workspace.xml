@@ -25,19 +25,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/manager/Server.java">
+      <file leaf-file-name="StoreHandlers.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="143">
-              <caret line="47" column="52" lean-forward="false" selection-start-line="47" selection-start-column="52" selection-end-line="47" selection-end-column="52" />
+            <state relative-caret-position="-621">
+              <caret line="106" column="75" lean-forward="false" selection-start-line="106" selection-start-column="75" selection-end-line="106" selection-end-column="75" />
               <folding>
-                <element signature="method#registMsg#0;class#Server#0" expanded="false" />
+                <element signature="method#update#0;class#StoreHandlers#0" expanded="false" />
+                <element signature="method#registMsg#0;class#StoreHandlers#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ManagerImpl.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ManagerImpl.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
@@ -65,9 +66,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/bookstore/Interfaces/Store.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bank/Impl/Transfer.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/Data.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Communicate.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Manager.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Context.java" />
@@ -96,10 +94,8 @@
         <option value="$PROJECT_DIR$/src/main/java/manager/Impl/Transations.java" />
         <option value="$PROJECT_DIR$/src/main/java/DO.java" />
         <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/Util.java" />
-        <option value="$PROJECT_DIR$/src/main/java/DO/DO.java" />
         <option value="$PROJECT_DIR$/src/main/java/DO/Util.java" />
         <option value="$PROJECT_DIR$/src/main/java/DO/ObjRef.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bookstore/Server.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Req/CommitReq.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Remote/RemoteManager.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Req/ContextReq.java" />
@@ -111,11 +107,16 @@
         <option value="$PROJECT_DIR$/src/main/java/manager/Data/Transation.java" />
         <option value="$PROJECT_DIR$/src/main/java/bank/Impl/BankImp.java" />
         <option value="$PROJECT_DIR$/src/main/java/bookstore/Impl/StoreImp.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bank/BankHandlers.java" />
-        <option value="$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java" />
         <option value="$PROJECT_DIR$/src/main/java/Client.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Server.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java" />
+        <option value="$PROJECT_DIR$/src/main/java/DO/DO.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/BackupStore.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bookstore/Data/Backup.java" />
+        <option value="$PROJECT_DIR$/src/main/java/DO/Backup.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bank/BankHandlers.java" />
+        <option value="$PROJECT_DIR$/src/main/java/bookstore/Server.java" />
       </list>
     </option>
   </component>
@@ -194,7 +195,7 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="manager" type="462c0819:PsiDirectoryNode" />
+              <item name="bank" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="distobj" type="b2602c69:ProjectViewProjectNode" />
@@ -202,8 +203,15 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="manager" type="462c0819:PsiDirectoryNode" />
-              <item name="Impl" type="462c0819:PsiDirectoryNode" />
+              <item name="bookstore" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="distobj" type="b2602c69:ProjectViewProjectNode" />
+              <item name="distobj" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="DO" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -474,12 +482,12 @@
       <workItem from="1514570993362" duration="14615000" />
       <workItem from="1514631216902" duration="693000" />
       <workItem from="1514632388709" duration="6738000" />
-      <workItem from="1514722438633" duration="14807000" />
+      <workItem from="1514722438633" duration="18142000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="89934000" />
+    <option name="totallyTimeSpent" value="93269000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -501,7 +509,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26272067" sideWeight="0.5063898" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22128174" sideWeight="0.5078684" order="3" side_tool="true" content_ui="tabs" x="-1892" y="659" width="1878" height="388" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22128174" sideWeight="0.5078684" order="3" side_tool="true" content_ui="tabs" x="-1892" y="659" width="1878" height="388" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.49574015" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12088698" sideWeight="0.49438202" order="0" side_tool="false" content_ui="combo" />
@@ -693,14 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/Data/Data.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/bank/Interfaces/Bank.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -769,14 +769,6 @@
             <element signature="e#685#686#0" expanded="false" />
             <element signature="e#734#735#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="10" column="13" lean-forward="false" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -852,14 +844,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/DO/DO.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="12" column="13" lean-forward="false" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/manager/Data/Transation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="412">
@@ -897,23 +881,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bank/BankHandlers.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1770">
-          <caret line="149" column="27" lean-forward="false" selection-start-line="149" selection-start-column="27" selection-end-line="149" selection-end-column="27" />
-          <folding>
-            <element signature="method#registMsg#0;class#BankHandlers#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2190">
-          <caret line="192" column="30" lean-forward="false" selection-start-line="192" selection-start-column="30" selection-end-line="192" selection-end-column="30" />
-          <folding>
-            <element signature="method#registMsg#0;class#StoreHandlers#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="105">
+          <caret line="22" column="29" lean-forward="true" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -927,7 +899,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/manager/Server.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
+        <state relative-caret-position="450">
           <caret line="47" column="52" lean-forward="false" selection-start-line="47" selection-start-column="52" selection-end-line="47" selection-end-column="52" />
           <folding>
             <element signature="method#registMsg#0;class#Server#0" expanded="false" />
@@ -935,11 +907,60 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/DO/DO.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="22" column="29" lean-forward="true" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
+        <state relative-caret-position="630">
+          <caret line="50" column="5" lean-forward="false" selection-start-line="50" selection-start-column="5" selection-end-line="50" selection-end-column="5" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bank/BankHandlers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="192" column="35" lean-forward="true" selection-start-line="192" selection-start-column="35" selection-end-line="192" selection-end-column="35" />
+          <folding>
+            <element signature="method#update#0;class#BankHandlers#0" expanded="false" />
+            <element signature="method#registMsg#0;class#BankHandlers#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/DO/Backup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#536#537#0" expanded="true" />
+            <element signature="e#572#573#0" expanded="true" />
+            <element signature="e#597#598#0" expanded="true" />
+            <element signature="e#629#630#0" expanded="true" />
+            <element signature="e#653#654#0" expanded="true" />
+            <element signature="e#683#684#0" expanded="true" />
+            <element signature="e#709#710#0" expanded="true" />
+            <element signature="e#735#736#0" expanded="true" />
+            <element signature="e#760#761#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="21" column="69" lean-forward="false" selection-start-line="21" selection-start-column="69" selection-end-line="21" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/bookstore/StoreHandlers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-621">
+          <caret line="106" column="75" lean-forward="false" selection-start-line="106" selection-start-column="75" selection-end-line="106" selection-end-column="75" />
+          <folding>
+            <element signature="method#update#0;class#StoreHandlers#0" expanded="false" />
+            <element signature="method#registMsg#0;class#StoreHandlers#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
