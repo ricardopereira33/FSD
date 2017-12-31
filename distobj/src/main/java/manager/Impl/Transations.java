@@ -1,4 +1,4 @@
-package manager.Data;
+package manager.Impl;
 
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
@@ -7,6 +7,7 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import log.*;
+import manager.Data.Transation;
 import pt.haslab.ekit.Clique;
 
 import java.util.HashMap;
@@ -64,7 +65,7 @@ public class Transations {
             });
             cli.open().thenRun(() -> {
                 System.out.println("open");
-                IntStream.range(0, add.length)
+                IntStream.range(1, add.length)
                         .forEach(i -> cli.send(i, new Prepare("Prepare", txid)));
             });
         }).join();

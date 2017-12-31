@@ -9,7 +9,7 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 
-import manager.Data.Transations;
+import manager.Impl.Transations;
 import manager.Rep.CommitRep;
 import manager.Rep.ContextRep;
 import manager.Rep.NewResourceRep;

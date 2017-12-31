@@ -1,3 +1,4 @@
+import bank.Interfaces.Bank;
 import bookstore.Data.ObjRef;
 import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
@@ -9,17 +10,28 @@ import manager.Remote.RemoteManager;
 
 public class Client {
     public static void main(String[] args) throws Exception {
-        Address store = new Address("127.0.0.1:1235");
-        DO d = new DO(store);
-        Store s =  (Store) d.oImport(new ObjRef(store,1,"Store"));
-        Manager m = new RemoteManager(1, new Address("127.0.0.1:1434"));
+        DO d = new DO();
+
+        // The addresses for Store, Bank and Manager
+        Address storeAddress = new Address("127.0.0.1:1235");
+        Address bankAddress = new Address("127.0.0.1:1934");
+        Address managerAddress= new Address("127.0.0.1:1434");
+
+        // Get Stubs for Store, Bank and Manager
+        //Store s =  (Store) d.oImport(new ObjRef(storeAddress,1,"Store"));
+        Bank bank = (Bank) d.oImport(new ObjRef(bankAddress, 1, "Bank"));
+        //Manager m = (Manager) d.oImport(new ObjRef(managerAddress, 1, "Manager"));
+
+
+        bank.transfer("store", "client", 20);
+
 
         /**
          * Manager m = ....;
          *
          *
          * m.begin();
-         * */
+         *
         System.out.println("Begin.");
         m.begin();
         
@@ -33,7 +45,7 @@ public class Client {
         System.out.println("Buy: " + cart.buy());
 
         m.commit();
-        System.out.println("End.");
+        System.out.println("End.");*/
         /**
          *
          * m.commit();

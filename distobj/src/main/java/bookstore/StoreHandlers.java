@@ -112,8 +112,7 @@ public class StoreHandlers {
                     Book b = null;
                     try{
                         b = s.search(m.title);
-                        Context con = new Context(m.txid, m.address);
-                        registInManager(con);
+                        registInManager(new Context(m.txid, m.address));
                     }
                     catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
                     ObjRef ref = d.oExport(b);
@@ -122,7 +121,10 @@ public class StoreHandlers {
                 c.handler(StoreMakeCartReq.class, (m) -> {
                     Store s = (Store) d.getElement(m.storeid);
                     Cart cart = null;
-                    try{ cart = s.newCart(); }
+                    try{
+                        cart = s.newCart();
+                        registInManager(new Context(m.txid, m.address));
+                    }
                     catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
                     ObjRef ref = d.oExport(cart);
 
@@ -131,11 +133,19 @@ public class StoreHandlers {
                 c.handler(CartAddReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
                     Book b = (Book) d.getElement(m.isbn);
+                    try {
+                        registInManager(new Context(m.txid, m.address));
+                    }
+                    catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
 
                     return Futures.completedFuture(new CartAddRep(cart.add(b)));
                 });
                 c.handler(CartBuyReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
+                    try {
+                        registInManager(new Context(m.txid, m.address));
+                    }
+                    catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
 
                     return Futures.completedFuture(new CartBuyRep(true, cart.buy()));
                 });
@@ -182,12 +192,12 @@ public class StoreHandlers {
         tc.execute(()->{
             cli.handler(Prepare.class, (s, m) -> {
                 System.out.println("Prepare");
-                //l.append(m);
+                //log.append(m);
                 cli.send(s,new Ok("Ok"));
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");
-                //l.append(m);
+                //log.append(m);
             });
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");

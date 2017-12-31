@@ -13,21 +13,20 @@ import java.util.List;
 import java.util.Map;
 
 public class BankImp implements Bank {
-    
-    public Map<Integer, AccountImp> accounts;
+    public Map<String, AccountImp> accounts;
     public Map<String, List<Transfer>> history;
 
     public BankImp() {
         history = new HashMap<>();
         accounts = new HashMap<>();
-        accounts.put(1, new AccountImp( "store", 0));
-        accounts.put(2, new AccountImp("client", 0));
+        accounts.put("store", new AccountImp( "store", 0));
+        accounts.put("client", new AccountImp("client", 0));
     }
 
     @Override
     public boolean transfer(String recv, String send, int value){
-        Account aRecv = accounts.get(recv);
-        Account aSend = accounts.get(send);
+        AccountImp aRecv = accounts.get(recv);
+        AccountImp aSend = accounts.get(send);
 
         aRecv.addValue(value);
         aSend.rmValue(value);

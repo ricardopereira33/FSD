@@ -53,7 +53,7 @@ public class RemoteBank implements Bank {
         TransferRep r = null;
         try {
             r = (TransferRep) tc.execute(() ->
-                    c.sendAndReceive(new TransferReq(recv, send, value, 1))
+                    c.sendAndReceive(new TransferReq(recv, send, value, id))
             ).join().get();
 
             return r.ok;

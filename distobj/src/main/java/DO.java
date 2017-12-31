@@ -16,7 +16,11 @@ public class DO {
     private Util u;
     private Map<Integer, Object> objs;
     private AtomicInteger id;
-    
+
+    public DO(){
+        u = new Util();
+    }
+
     public DO(Address address) {
         u = new Util();
         this.objs = new HashMap<>();
@@ -37,9 +41,12 @@ public class DO {
     
     public Object oImport(ObjRef or) throws UnexpectedException{
         switch(or.cls){
-            case "Bank"   : return u.makeCart(or);
+            case "Cart"   : return u.makeCart(or);
             case "Store"  : return u.makeStore(or);
             case "Book"   : return u.makeBook(or);
+            case "Bank"   : return u.makeBank(or);
+            case "Account": return u.makeAccount(or);
+            case "Manager": return u.makeManager(or);
         }
         return null;
     }
