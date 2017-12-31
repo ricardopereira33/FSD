@@ -33,9 +33,10 @@ public class Client {
         Cart cart = s.newCart();
 
         System.out.println("Add: " + cart.add(b));
-        System.out.println("Buy: " + cart.buy());
+        int value = cart.buy();
+        System.out.println("Buy: " + value);
 
-        bank.transfer("store", "client", 20);
+        bank.transfer("store", "client", value);
 
         m.commit();
         System.out.println("End.");

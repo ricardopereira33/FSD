@@ -91,9 +91,9 @@ public class BankHandlers {
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
                 c.handler(TransferReq.class, (m) -> {
-                    Bank b = (Bank) d.getElement(m.bankid);
+                    BankImp b = (BankImp) d.getElement(m.bankid);
                     boolean res = b.transfer(m.recv, m.send, m.value);
-                    try{ registInManager(new Context(m.txid, m.address));}
+                    try{ registInManager(new Context(m.txid, m.address), b);}
                     catch(Exception e){ System.out.println("Erro: "+ e.getMessage());}
 
                     return Futures.completedFuture(new TransferRep(res));
@@ -102,7 +102,7 @@ public class BankHandlers {
         });
     }
 
-    private void registInManager(Context ctx) throws Exception {
+    private void registInManager(Context ctx, BankImp b) throws Exception {
         Transport t = new NettyTransport();
         if(tcManager == null) {
             tcManager = new SingleThreadContext("srv-%d", new Serializer());
@@ -111,7 +111,7 @@ public class BankHandlers {
             conManager = tcManager.execute( () ->
                     t.client().connect(ctx.getAddress())
             ).join().get();
-            createClique(ctx.getAddress());
+            createClique(ctx.getAddress(), b);
         }
         int managerid = 1;
         NewResourceRep r = null;
@@ -123,10 +123,11 @@ public class BankHandlers {
         catch (Exception e){
             System.out.println("Erro in Manager: " + e.getMessage());
         }
+        b.lock();
         this.id = r.idRes;
     }
 
-    private void createClique(Address address) {
+    private void createClique(Address address, BankImp b) {
         Transport tr = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
         Address[] addrs = getAddress(address);
@@ -141,10 +142,12 @@ public class BankHandlers {
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");
+                b.unlock();
                 log.append(m);
             });
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
+                b.unlock();
                 //rollback();
             });
             cli.open().thenRun(() ->{

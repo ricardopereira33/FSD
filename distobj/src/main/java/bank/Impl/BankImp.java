@@ -11,16 +11,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BankImp implements Bank {
     public Map<String, AccountImp> accounts;
     public Map<String, List<Transfer>> history;
+    private ReentrantLock lock;
 
     public BankImp() {
         history = new HashMap<>();
         accounts = new HashMap<>();
         accounts.put("store", new AccountImp( "store", 0));
         accounts.put("client", new AccountImp("client", 0));
+        this.lock = new ReentrantLock();
     }
 
     @Override
@@ -47,5 +50,13 @@ public class BankImp implements Bank {
             list.add(trans);
             history.put(recv, list);
         }
+    }
+
+    public void lock() {
+        this.lock.lock();
+    }
+
+    public void unlock(){
+        this.lock.unlock();
     }
 }

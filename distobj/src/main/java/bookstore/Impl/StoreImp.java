@@ -46,4 +46,12 @@ public class StoreImp implements Store {
             history.put(b.getIsbn(), (BookImp) b);
         }
     }
+
+    public void lock() {
+        this.lock.lock();
+    }
+
+    public void unlock(){
+        this.lock.unlock();
+    }
 }

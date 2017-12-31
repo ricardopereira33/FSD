@@ -109,22 +109,22 @@ public class StoreHandlers {
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
                 c.handler(StoreSearchReq.class, (m) -> {
-                    Store s = (Store) d.getElement(m.storeid);
+                    StoreImp s = (StoreImp) d.getElement(m.storeid);
                     Book b = null;
                     try{
                         b = s.search(m.title);
-                        registInManager(new Context(m.txid, m.address));
+                        registInManager(new Context(m.txid, m.address), s);
                     }
                     catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
                     ObjRef ref = d.oExport(b);
                     return Futures.completedFuture(new StoreSearchRep(ref));
                 });
                 c.handler(StoreMakeCartReq.class, (m) -> {
-                    Store s = (Store) d.getElement(m.storeid);
+                    StoreImp s = (StoreImp) d.getElement(m.storeid);
                     Cart cart = null;
                     try{
                         cart = s.newCart();
-                        registInManager(new Context(m.txid, m.address));
+                        registInManager(new Context(m.txid, m.address), s);
                     }
                     catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
                     ObjRef ref = d.oExport(cart);
@@ -135,7 +135,7 @@ public class StoreHandlers {
                     Cart cart = (Cart) d.getElement(m.cartid);
                     Book b = (Book) d.getElement(m.isbn);
                     try {
-                        registInManager(new Context(m.txid, m.address));
+                        registInManager(new Context(m.txid, m.address), null);
                     }
                     catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
 
@@ -144,7 +144,7 @@ public class StoreHandlers {
                 c.handler(CartBuyReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
                     try {
-                        registInManager(new Context(m.txid, m.address));
+                        registInManager(new Context(m.txid, m.address), null);
                     }
                     catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
 
@@ -154,7 +154,7 @@ public class StoreHandlers {
         });
     }
 
-    private void registInManager(Context ctx) throws Exception {
+    private void registInManager(Context ctx, StoreImp s) throws Exception {
         Transport t = new NettyTransport();
         if(tcManager == null) {
             tcManager = new SingleThreadContext("srv-%d", new Serializer());
@@ -163,7 +163,7 @@ public class StoreHandlers {
             conManager = tcManager.execute( () ->
                     t.client().connect(ctx.getAddress())
             ).join().get();
-            createClique(ctx.getAddress());
+            createClique(ctx.getAddress(), s);
         }
         int managerid = 1;
         NewResourceRep r = null;
@@ -175,10 +175,12 @@ public class StoreHandlers {
         catch (Exception e){
             System.out.println("Erro in Manager: " + e.getMessage());
         }
+        if(s != null)
+            s.lock();
         this.id = r.idRes;
     }
 
-    private void createClique(Address address) {
+    private void createClique(Address address, StoreImp si) {
         Transport tr = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
         Address[] addrs = getAddress(address);
@@ -193,10 +195,12 @@ public class StoreHandlers {
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");
+                si.unlock();
                 log.append(m);
             });
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
+                si.unlock();
                 //rollback();
             });
             cli.open().thenRun(() ->{
