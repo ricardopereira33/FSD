@@ -1,32 +1,24 @@
-package bookstore;
+package bank;
 
+import DO.DO;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import pt.haslab.ekit.Log;
-import DO.DO;
 
-public class Server {
-
+public class ServerBank {
     public static void main(String[] args) throws Exception {
         //Initial settings
         Transport t = new NettyTransport();
         SingleThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
-
-        //int id = Integer.parseInt(args[0]);
-        //System.out.println("id: " + id);
-
-        Address[] address = new Address[]{
-                new Address("127.0.0.1:1135"),
-                new Address("127.0.0.1:2134"),
-        };
-        DO d = new DO(address[0]);
-        Log log = new Log("log_bookstore");
+        Address address = new Address("127.0.0.1:1934");
+        DO d = new DO(address);
+        Log log = new Log("log_bank");
 
         // Regist Messages and Handlers
-        StoreHandlers sh = new StoreHandlers(t, tc, address[0], d, log);
-        sh.exe();
+        BankHandlers bh = new BankHandlers(t,tc,address,d,log);
+        bh.exe();
     }
 }

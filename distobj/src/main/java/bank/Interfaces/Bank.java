@@ -10,5 +10,5 @@ package bank.Interfaces;
  * @author Ricardo
  */
 public interface Bank {
-    Account newAccount(String id);
+    Account access(String id);
 }

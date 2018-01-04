@@ -6,8 +6,8 @@ import DO.Backup;
 import bank.Impl.BankImp;
 import bank.Interfaces.Account;
 import bank.Interfaces.Bank;
-import bank.Rep.newAccountRep;
-import bank.Req.newAccountReq;
+import bank.Rep.*;
+import bank.Req.*;
 import io.atomix.catalyst.concurrent.Futures;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
@@ -23,6 +23,7 @@ import manager.Req.NewResourceReq;
 import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
+import java.rmi.UnexpectedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +59,7 @@ public class BankHandlers {
         registMsg();
         registLogHandlers();
 
-        System.out.println("Server running...");
+        System.out.println("ServerBank running...");
     }
 
     private void registLogHandlers() {
@@ -110,15 +111,51 @@ public class BankHandlers {
     private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
-                c.handler(newAccountReq.class, (m) -> {
+                c.handler(accessReq.class, (m) -> {
                     BankImp b = (BankImp) d.getElement(m.bankid);
-                    Account ac = b.newAccount(m.id);
+                    Account ac = b.access(m.id);
                     try{
+                        System.out.println("fdsf: " + m.ctx);
                         registInManager(m.ctx, b);
                     }
-                    catch(Exception e){ System.out.println("Erro: "+ e.getMessage());}
+                    catch(Exception e){ e.printStackTrace();}
 
-                    return Futures.completedFuture(new newAccountRep(d.oExport(ac)));
+                    return Futures.completedFuture(new accessRep(d.oExport(ac)));
+                });
+                c.handler(transferReq.class, (m) -> {
+                    Account ac = (Account) d.getElement(m.accountid);
+                    Account aOther = null;
+                    try {
+                        aOther = (Account) d.oImport(m.ref);
+                        if(aOther == null)
+                            aOther = (Account) d.getElement(m.accountid);
+
+                        ac.transfer(aOther, m.value);
+                    } catch (UnexpectedException e) { e.printStackTrace(); }
+
+                    return Futures.completedFuture(new transferRep(true));
+                });
+                c.handler(creditReq.class, (m) -> {
+                    Account ac = (Account) d.getElement(m.accountid);
+                    ac.credit(m.value);
+
+                    return Futures.completedFuture(new creditRep(true));
+                });
+                c.handler(debitReq.class, (m) -> {
+                    Account ac = (Account) d.getElement(m.accountid);
+                    ac.debit(m.value);
+
+                    return Futures.completedFuture(new debitRep(true));
+                });
+                c.handler(getIdReq.class, (m) -> {
+                    Account ac = (Account) d.getElement(m.accountid);
+
+                    return Futures.completedFuture(new getIdRep(ac.getId()));
+                });
+                c.handler(historyReq.class, (m) -> {
+                    Account ac = (Account) d.getElement(m.accountid);
+
+                    return Futures.completedFuture(new historyRep(ac.getHistory()));
                 });
             });
         });
@@ -144,9 +181,18 @@ public class BankHandlers {
     }
 
     private void registMsg(){
-        tc.serializer().register(newAccountRep.class);
-        tc.serializer().register(newAccountReq.class);
-        tc.serializer().register(ObjRef.class);
+        tc.serializer().register(accessRep.class);
+        tc.serializer().register(accessReq.class);
+        tc.serializer().register(transferRep.class);
+        tc.serializer().register(transferReq.class);
+        tc.serializer().register(creditRep.class);
+        tc.serializer().register(creditReq.class);
+        tc.serializer().register(debitRep.class);
+        tc.serializer().register(debitReq.class);
+        tc.serializer().register(getIdRep.class);
+        tc.serializer().register(getIdReq.class);
+        tc.serializer().register(historyRep.class);
+        tc.serializer().register(historyReq.class);
         tc.serializer().register(Abort.class);
         tc.serializer().register(Commit.class);
         tc.serializer().register(Ok.class);
@@ -155,6 +201,8 @@ public class BankHandlers {
         tc.serializer().register(Address.class);
         tc.serializer().register(NewResourceRep.class);
         tc.serializer().register(NewResourceReq.class);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(ObjRef.class);
     }
 
     private void connectManager(Context ctx, BankImp b) throws Exception {

@@ -1,10 +1,11 @@
 package bank.Remote;
 
+import DO.ObjRef;
 import bank.Interfaces.Account;
 import bank.Interfaces.Bank;
-import bank.Rep.newAccountRep;
+import bank.Rep.accessRep;
 import DO.Util;
-import bank.Req.newAccountReq;
+import bank.Req.accessReq;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
@@ -37,23 +38,26 @@ public class RemoteBank implements Bank {
     }
 
     private void registeMsg(){
-        tc.serializer().register(newAccountRep.class);
-        tc.serializer().register(newAccountReq.class);
+        tc.serializer().register(accessRep.class);
+        tc.serializer().register(accessReq.class);
+        tc.serializer().register(ObjRef.class);
+        tc.serializer().register(Address.class);
+        tc.serializer().register(Context.class);
     }
 
 
     @Override
-    public Account newAccount(String id) {
-        newAccountRep r = null;
+    public Account access(String id) {
+        accessRep r = null;
         Context ctx = RemoteManager.ctx.get();
         try {
-            r = (newAccountRep) tc.execute(() ->
-                    c.sendAndReceive(new newAccountReq(id, this.id, ctx))
+            r = (accessRep) tc.execute(() ->
+                    c.sendAndReceive(new accessReq(id, this.id, ctx))
             ).join().get();
 
             return u.makeAccount(r.ref);
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return null;

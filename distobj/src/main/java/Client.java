@@ -1,5 +1,8 @@
 import DO.ObjRef;
 import DO.DO;
+import bank.Data.Invoice;
+import bank.Interfaces.Account;
+import bank.Interfaces.Bank;
 import bookstore.Impl.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
@@ -17,7 +20,7 @@ public class Client {
 
         // Get Stubs for Store, Bank and Manager
         Store s =  (Store) d.oImport(new ObjRef(storeAddress,1,"Store"));
-        //Bank bank = (Bank) d.oImport(new ObjRef(bankAddress, 1, "Bank"));
+        Bank bank = (Bank) d.oImport(new ObjRef(bankAddress, 1, "Bank"));
         Manager m = (Manager) d.oImport(new ObjRef(managerAddress, 1, "Manager"));
 
         /** Transation **/
@@ -30,10 +33,15 @@ public class Client {
 
         Cart cart = s.newCart();
         System.out.println("Add: " + cart.add(b));
-        int value = cart.buy();
-        System.out.println("Buy: " + value);
+        Invoice i = cart.buy();
+        System.out.println("Buy: " + i.getValue());
 
-        //bank.transfer("store", "client", value);
+        Account aClient = bank.access("client");
+        Account aStore = bank.access(i.getReference());
+
+        aClient.transfer(aStore, i.getValue());
+
+        aClient.getHistory().stream().forEach((e) -> System.out.println(e));
 
         m.commit();
         System.out.println("End.");

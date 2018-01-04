@@ -38,8 +38,19 @@ public class RemoteAccount implements Account{
     }
 
     private void registeMsg() {
-        tc.serializer().register(newAccountRep.class);
-        tc.serializer().register(newAccountReq.class);
+        tc.serializer().register(transferRep.class);
+        tc.serializer().register(transferReq.class);
+        tc.serializer().register(creditRep.class);
+        tc.serializer().register(creditReq.class);
+        tc.serializer().register(debitRep.class);
+        tc.serializer().register(debitReq.class);
+        tc.serializer().register(getIdRep.class);
+        tc.serializer().register(getIdReq.class);
+        tc.serializer().register(historyRep.class);
+        tc.serializer().register(historyReq.class);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(ObjRef.class);
+        tc.serializer().register(Address.class);
     }
 
     @Override
@@ -51,9 +62,8 @@ public class RemoteAccount implements Account{
             r = (transferRep) tc.execute(() ->
                     c.sendAndReceive(new transferReq(id, value, or, ctx))
             ).join().get();
-
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

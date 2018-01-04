@@ -50,6 +50,9 @@ public class DO {
     }
     
     public Object oImport(ObjRef or) throws UnexpectedException{
+        if(this.address != null && address.port() == this.address.port())
+            return null;
+
         switch(or.cls){
             case "Cart"   : return u.makeCart(or);
             case "Store"  : return u.makeStore(or);

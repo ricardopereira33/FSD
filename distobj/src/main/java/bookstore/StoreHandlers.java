@@ -3,6 +3,7 @@ package bookstore;
 import DO.DO;
 import DO.Backup;
 import DO.ObjRef;
+import bank.Data.Invoice;
 import bookstore.Impl.Book;
 import bookstore.Impl.StoreImp;
 import bookstore.Interfaces.Cart;
@@ -67,7 +68,7 @@ public class StoreHandlers {
         registMsg();
         registLogHandlers();
 
-        System.out.println("Server running...");
+        System.out.println("ServerStore running...");
     }
 
     private void registLogHandlers() {
@@ -190,6 +191,7 @@ public class StoreHandlers {
         tc.serializer().register(NewResourceReq.class);
         tc.serializer().register(Context.class);
         tc.serializer().register(Book.class);
+        tc.serializer().register(Invoice.class);
     }
 
     private void registInManager(Context ctx, StoreImp s) throws Exception {

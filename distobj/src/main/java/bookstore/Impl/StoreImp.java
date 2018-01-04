@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class StoreImp implements Store, CatalystSerializable {
-    
     public Map<Integer, Book> books;
     public Map<Integer, Book> history;
     public ReentrantLock lock;

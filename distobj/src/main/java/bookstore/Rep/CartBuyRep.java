@@ -5,6 +5,7 @@
  */
 package bookstore.Rep;
 
+import bank.Data.Invoice;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
@@ -16,24 +17,24 @@ import io.atomix.catalyst.serializer.Serializer;
  */
 public class CartBuyRep implements CatalystSerializable {
     public boolean ok;
-    public int price;
+    public Invoice i;
 
     public CartBuyRep() {}
 
-    public CartBuyRep(boolean result, int price) {
-        this.price = price;
+    public CartBuyRep(boolean result, Invoice i) {
+        this.i = i;
         this.ok = result;
     }
     
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
-        bo.writeInt(price);
+        srlzr.writeObject(i, bo);
         bo.writeBoolean(ok);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
-        price = bi.readInt();
+        i = srlzr.readObject(bi);
         ok = bi.readBoolean();
     }
 }

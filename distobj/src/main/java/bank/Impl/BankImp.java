@@ -17,9 +17,14 @@ public class BankImp implements Bank {
     }
 
     @Override
-    public Account newAccount(String id) {
-        Account ac = new AccountImp(id, 0);
-        accounts.put(id, ac);
+    public Account access(String id) {
+        Account ac = null;
+        if(!accounts.containsKey(id)) {
+            ac = new AccountImp(id, 0);
+            accounts.put(id, ac);
+        }
+        else ac = accounts.get(id);
+
         return ac;
     }
 

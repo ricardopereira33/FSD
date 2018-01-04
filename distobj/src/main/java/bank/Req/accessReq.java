@@ -7,14 +7,14 @@ import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 import manager.Data.Context;
 
-public class newAccountReq implements CatalystSerializable {
+public class accessReq implements CatalystSerializable {
     public String id;
     public int bankid;
     public Context ctx;
     
-    public newAccountReq() {}
+    public accessReq() {}
 
-    public newAccountReq(String id, int bankid, Context tx) {
+    public accessReq(String id, int bankid, Context ctx) {
         this.id = id;
         this.bankid = bankid;
         this.ctx = ctx;

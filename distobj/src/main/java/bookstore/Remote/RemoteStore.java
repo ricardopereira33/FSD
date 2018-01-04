@@ -32,7 +32,6 @@ public class RemoteStore implements Store {
         this.id = id;
         tc = new SingleThreadContext("srv-%d", new Serializer());
         this.address = address;
-
         registeMsg();
 
         c = tc.execute(() ->

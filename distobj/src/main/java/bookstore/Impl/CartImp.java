@@ -5,6 +5,7 @@
  */
 package bookstore.Impl;
 
+import bank.Data.Invoice;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 import java.util.ArrayList;
@@ -30,10 +31,10 @@ public class CartImp implements Cart {
     }
 
     @Override
-    public int buy() {
+    public Invoice buy() {
         s.addHistory(content);
         int total = content.stream().mapToInt(Book::getPrice).sum();
         content.clear();
-        return total;
+        return new Invoice(total, "store");
     }
   }

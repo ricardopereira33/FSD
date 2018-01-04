@@ -6,12 +6,12 @@ import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
 
-public class newAccountRep implements CatalystSerializable {
+public class accessRep implements CatalystSerializable {
     public ObjRef ref;
     
-    public newAccountRep() {}
+    public accessRep() {}
 
-    public newAccountRep(ObjRef ref) {
+    public accessRep(ObjRef ref) {
         this.ref = ref;
     }
 

@@ -1,5 +1,6 @@
 package bookstore.Remote;
 
+import bank.Data.Invoice;
 import bookstore.Impl.Book;
 import bookstore.Rep.CartBuyRep;
 import bookstore.Req.CartBuyReq;
@@ -44,6 +45,7 @@ public class RemoteCart implements Cart{
         tc.serializer().register(CartBuyRep.class);
         tc.serializer().register(Context.class);
         tc.serializer().register(Book.class);
+        tc.serializer().register(Invoice.class);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class RemoteCart implements Cart{
     }
 
     @Override
-    public int buy() {
+    public Invoice buy() {
         CartBuyRep r = null;
         Context ctx = RemoteManager.ctx.get();
         try {
@@ -72,11 +74,11 @@ public class RemoteCart implements Cart{
                     c.sendAndReceive(new CartBuyReq(id, ctx))
             ).join().get();
             
-            return r.price;
+            return r.i;
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
         }
         
-        return 0;
+        return null;
     }
 }

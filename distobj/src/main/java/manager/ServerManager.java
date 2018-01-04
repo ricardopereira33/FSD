@@ -23,7 +23,7 @@ import pt.haslab.ekit.Log;
  *
  * @author Ricardo
  */
-public class Server {
+public class ServerManager {
     
     public static void main(String[] args) throws Exception{
         Address address = new Address("127.0.0.1:1434");
@@ -45,7 +45,7 @@ public class Server {
                 System.out.println("Log: Abort");
             });
             l.open().thenRun(()-> { 
-                System.out.println("Server running... ");
+                System.out.println("ServerManager running... ");
                 ManagerImpl txs = new ManagerImpl(l);
                 d.oExport(txs);
 

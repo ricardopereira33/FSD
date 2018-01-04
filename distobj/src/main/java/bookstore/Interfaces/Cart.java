@@ -5,6 +5,7 @@
  */
 package bookstore.Interfaces;
 
+import bank.Data.Invoice;
 import bookstore.Impl.Book;
 
 /**
@@ -13,5 +14,5 @@ import bookstore.Impl.Book;
  */
 public interface Cart {
     boolean add(Book b);
-    int buy();
+    Invoice buy();
 }
