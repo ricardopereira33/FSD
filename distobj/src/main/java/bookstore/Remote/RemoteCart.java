@@ -1,6 +1,6 @@
 package bookstore.Remote;
 
-import bookstore.Interfaces.Book;
+import bookstore.Impl.Book;
 import bookstore.Rep.CartBuyRep;
 import bookstore.Req.CartBuyReq;
 import DO.Util;
@@ -42,6 +42,8 @@ public class RemoteCart implements Cart{
         tc.serializer().register(CartAddRep.class);
         tc.serializer().register(CartBuyReq.class);
         tc.serializer().register(CartBuyRep.class);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(Book.class);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class RemoteCart implements Cart{
         Context ctx = RemoteManager.ctx.get();
         try {
             r = (CartAddRep) tc.execute(() ->
-                    c.sendAndReceive(new CartAddReq(id, b.getIsbn(), ctx))
+                    c.sendAndReceive(new CartAddReq(id, b, ctx))
             ).join().get();
             
             return r.ok;

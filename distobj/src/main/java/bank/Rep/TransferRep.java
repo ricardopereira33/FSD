@@ -1,16 +1,17 @@
 package bank.Rep;
 
+import DO.ObjRef;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
 
-public class TransferRep implements CatalystSerializable {
+public class transferRep implements CatalystSerializable {
     public boolean ok;
-    
-    public TransferRep() {}
 
-    public TransferRep(boolean ok) {
+    public transferRep() {}
+
+    public transferRep(boolean ok) {
         this.ok = ok;
     }
 

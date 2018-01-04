@@ -1,5 +1,9 @@
 package DO;
 
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.CatalystSerializable;
+import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 import java.rmi.UnexpectedException;
 import java.util.HashMap;
@@ -27,6 +31,13 @@ public class DO {
         this.id = new AtomicInteger(0);
     }
 
+    public DO(Address address[], int id) {
+        u = new Util();
+        this.objs = new HashMap<>();
+        this.address = address[id];
+        this.id = new AtomicInteger(0);
+    }
+
     public Object getElement(int index){
         return objs.get(index);
     }
@@ -42,11 +53,18 @@ public class DO {
         switch(or.cls){
             case "Cart"   : return u.makeCart(or);
             case "Store"  : return u.makeStore(or);
-            case "Book"   : return u.makeBook(or);
             case "Bank"   : return u.makeBank(or);
             case "Account": return u.makeAccount(or);
             case "Manager": return u.makeManager(or);
         }
         return null;
+    }
+
+    public DO clone(){
+        DO res = new DO(this.address);
+        for(Object o: objs.values()){
+            res.oExport(o);
+        }
+        return res;
     }
 }

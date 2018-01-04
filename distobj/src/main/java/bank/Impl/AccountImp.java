@@ -6,9 +6,6 @@
 package bank.Impl;
 
 import bank.Interfaces.Account;
-import bookstore.Interfaces.Book;
-import bookstore.Interfaces.Cart;
-import bookstore.Interfaces.Store;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,31 +16,46 @@ import java.util.List;
  */
 public class AccountImp implements Account {
     private String id;
+    private List<String> history;
     private int value;
 
     public AccountImp(String id, int value){
         this.id = id;
         this.value = value;
+        this.history = new ArrayList<>();
+    }
+
+
+    @Override
+    public void transfer(Account ac, int value) {
+        debit(value);
+        ac.credit(value);
+        String id = ac.getId();
+        addToHistory(id, value);
     }
 
     @Override
-    public int getValue() {
-        return value;
-    }
-
-    @Override
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    @Override
-    public void addValue(int value){
+    public void credit(int value) {
         this.value += value;
     }
 
     @Override
-    public void rmValue(int value){
-        this.value -= value;
+    public void debit(int value) {
+        this.value = value;
+    }
+
+    @Override
+    public List<String> getHistory(){
+        return history;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    private void addToHistory(String id, int value) {
+        history.add("ID: "+ id +"\tValue: " + value);
     }
 
   }

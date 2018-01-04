@@ -12,31 +12,27 @@ import manager.Data.Context;
 public class StoreSearchReq implements CatalystSerializable {
     public String title;
     public int storeid;
-    public int txid;
-    public Address address;
+    public Context ctx;
 
     public StoreSearchReq() { }
 
     public StoreSearchReq(String title, int id, Context ctx) {
         this.title = title;
         this.storeid = id;
-        this.txid = ctx.getTxid();
-        this.address = ctx.getAddress();
+        this.ctx = ctx;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         bufferOutput.writeString(title);
         bufferOutput.writeInt(storeid);
-        bufferOutput.writeInt(txid);
-        serializer.writeObject(address, bufferOutput);
+        serializer.writeObject(ctx, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         title = bufferInput.readString();
         storeid = bufferInput.readInt();
-        txid = bufferInput.readInt();
-        address = serializer.readObject(bufferInput);
+        ctx = serializer.readObject(bufferInput);
     }
 }

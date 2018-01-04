@@ -5,14 +5,13 @@
  */
 package bookstore.Interfaces;
 
-import bookstore.Impl.BookImp;
+import bookstore.Impl.Book;
 
 /**
  *
  * @author Ricardo
  */
 public interface Cart {
-    
     boolean add(Book b);
     int buy();
 }

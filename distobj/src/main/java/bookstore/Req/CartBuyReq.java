@@ -18,29 +18,25 @@ import manager.Data.Context;
  */
 public class CartBuyReq implements CatalystSerializable{
     public int cartid;
-    public int txid;
-    public Address address;
+    public Context ctx;
 
     public CartBuyReq(){ }
     
     public CartBuyReq(int id, Context ctx) {
         this.cartid = id;
-        this.txid = ctx.getTxid();
-        this.address = ctx.getAddress();
+        this.ctx = ctx;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
         bo.writeInt(cartid);
-        bo.writeInt(txid);
-        srlzr.writeObject(address, bo);
+        srlzr.writeObject(ctx, bo);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         cartid = bi.readInt();
-        txid = bi.readInt();
-        address = srlzr.readObject(bi);
+        ctx = srlzr.readObject(bi);
     }
     
 }

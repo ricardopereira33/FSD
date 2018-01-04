@@ -4,9 +4,10 @@ import DO.DO;
 import DO.ObjRef;
 import DO.Backup;
 import bank.Impl.BankImp;
+import bank.Interfaces.Account;
 import bank.Interfaces.Bank;
-import bank.Rep.TransferRep;
-import bank.Req.TransferReq;
+import bank.Rep.newAccountRep;
+import bank.Req.newAccountReq;
 import io.atomix.catalyst.concurrent.Futures;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
@@ -22,6 +23,10 @@ import manager.Req.NewResourceReq;
 import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class BankHandlers {
     private Transport t;
     private ThreadContext tc;
@@ -32,7 +37,8 @@ public class BankHandlers {
     private ThreadContext tcManager;
     private Connection conManager;
     private Clique cli;
-    private Backup backup;
+    private HashMap<Integer, Object> volatilLog;
+    private AtomicInteger index;
 
     public BankHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
         this.t = t;
@@ -44,7 +50,8 @@ public class BankHandlers {
         this.tcManager = null;
         this.conManager = null;
         this.cli = null;
-        this.backup = null;
+        this.volatilLog = new HashMap<>();
+        this.index = new AtomicInteger(0);
     }
 
     public void exe(){
@@ -57,50 +64,61 @@ public class BankHandlers {
     private void registLogHandlers() {
         tc.execute(() ->{
             log.handler(Prepare.class, (sender, msg)-> {
-                System.out.println("Log: Prepare");
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Commit.class, (sender, msg)-> {
-                System.out.println("Log: Commit");
-                update();
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Abort.class, (sender, msg)->{
-                System.out.println("Log: Abort");
-                this.backup = null;
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Backup.class, (sender, msg) -> {
-                System.out.println("Backup");
-                this.backup = msg;
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
+                // readLog();
                 Bank b = new BankImp();
                 d.oExport(b);
             });
         });
     }
 
-    private void update() {
-        this.d = this.backup.getD();
-        this.id = this.backup.getId();
-        this.tcManager = this.backup.getTc();
-        this.conManager = this.backup.getC();
-        this.cli = this.backup.getCli();
-        this.backup = null;
+    private void readLog() {
+        for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
+            switch(e.getValue().getClass().getName()){
+                case "Prepare":
+                    System.out.println("Log: Prepare");
+                    break;
+                case "Commit":
+                    System.out.println("Log: Commit");
+                    break;
+                case "Abort":
+                    System.out.println("Log: Abort");
+                    break;
+                case "Backup":
+                    System.out.println("Log: Abort");
+                    break;
+            }
+        }
     }
 
     private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
-                c.handler(TransferReq.class, (m) -> {
+                c.handler(newAccountReq.class, (m) -> {
                     BankImp b = (BankImp) d.getElement(m.bankid);
-                    boolean res = b.transfer(m.recv, m.send, m.value);
+                    Account ac = b.newAccount(m.id);
                     try{
-                        registInManager(new Context(m.txid, m.address), b);
-                        registLog();
+                        registInManager(m.ctx, b);
                     }
                     catch(Exception e){ System.out.println("Erro: "+ e.getMessage());}
 
-                    return Futures.completedFuture(new TransferRep(res));
+                    return Futures.completedFuture(new newAccountRep(d.oExport(ac)));
                 });
             });
         });
@@ -109,13 +127,7 @@ public class BankHandlers {
     private void registInManager(Context ctx, BankImp b) throws Exception {
         Transport t = new NettyTransport();
         if(tcManager == null) {
-            tcManager = new SingleThreadContext("srv-%d", new Serializer());
-            tcManager.serializer().register(NewResourceRep.class);
-            tcManager.serializer().register(NewResourceReq.class);
-            conManager = tcManager.execute( () ->
-                    t.client().connect(ctx.getAddress())
-            ).join().get();
-            createClique(ctx.getAddress(), b);
+            connectManager(ctx, b);
         }
         int managerid = 1;
         NewResourceRep r = null;
@@ -132,8 +144,8 @@ public class BankHandlers {
     }
 
     private void registMsg(){
-        tc.serializer().register(TransferRep.class);
-        tc.serializer().register(TransferReq.class);
+        tc.serializer().register(newAccountRep.class);
+        tc.serializer().register(newAccountReq.class);
         tc.serializer().register(ObjRef.class);
         tc.serializer().register(Abort.class);
         tc.serializer().register(Commit.class);
@@ -145,9 +157,14 @@ public class BankHandlers {
         tc.serializer().register(NewResourceReq.class);
     }
 
-    private void registLog() {
-        Backup b = new Backup(d, tcManager, conManager, cli, id);
-        log.append(b);
+    private void connectManager(Context ctx, BankImp b) throws Exception {
+        tcManager = new SingleThreadContext("srv-%d", new Serializer());
+        tcManager.serializer().register(NewResourceRep.class);
+        tcManager.serializer().register(NewResourceReq.class);
+        conManager = tcManager.execute( () ->
+                t.client().connect(ctx.getAddress())
+        ).join().get();
+        createClique(ctx.getAddress(), b);
     }
 
     private void createClique(Address address, BankImp b) {
@@ -171,8 +188,6 @@ public class BankHandlers {
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
                 b.unlock();
-                update();
-                this.backup = null;
             });
             cli.open().thenRun(() ->{
                 System.out.println("2PC begin.");

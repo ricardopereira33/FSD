@@ -5,12 +5,10 @@
  */
 package bank.Interfaces;
 
-import bookstore.Interfaces.Book;
-
 /**
  *
  * @author Ricardo
  */
 public interface Bank {
-    boolean transfer(String recv, String send, int value);
+    Account newAccount(String id);
 }

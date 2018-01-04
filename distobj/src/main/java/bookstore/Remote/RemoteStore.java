@@ -2,7 +2,7 @@ package bookstore.Remote;
 
 import DO.Util;
 import DO.ObjRef;
-import bookstore.Interfaces.Book;
+import bookstore.Impl.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 import bookstore.Rep.StoreMakeCartRep;
@@ -47,6 +47,8 @@ public class RemoteStore implements Store {
         tc.serializer().register(StoreMakeCartReq.class);
         tc.serializer().register(ObjRef.class);
         tc.serializer().register(Address.class);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(Book.class);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class RemoteStore implements Store {
                 c.sendAndReceive(new StoreSearchReq(title, id, ctx))
         ).join().get();
 
-        return u.makeBook(r.ref);
+        return r.b;
     }
 
     @Override

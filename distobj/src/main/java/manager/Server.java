@@ -26,10 +26,11 @@ import pt.haslab.ekit.Log;
 public class Server {
     
     public static void main(String[] args) throws Exception{
-        Address address = new Address(":1434");
+        Address address = new Address("127.0.0.1:1434");
         Transport t = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
-        DO d = new DO(new Address("127.0.0.1:1434"));
+        DO d = new DO(address);
+
         // log_0 is coord log
         Log l = new Log("log_manager");
         
@@ -88,9 +89,9 @@ public class Server {
                 c.handler(CommitReq.class, (m) -> {
                     // end Transation
                     ManagerImpl txs = (ManagerImpl) d.getElement(m.managerid);
-                    try{ txs.start2PC(m.txid, address);}
+                    try{ txs.start2PC(m.ctx.getTxid(), address);}
                     catch(Exception e){
-                        System.out.println("Erro: " + e.getMessage());
+                        e.printStackTrace();
                     }
 
                     return Futures.completedFuture(new CommitRep(true));

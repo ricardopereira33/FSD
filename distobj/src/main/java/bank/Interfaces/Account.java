@@ -5,15 +5,16 @@
  */
 package bank.Interfaces;
 
-import bookstore.Interfaces.Book;
+import java.util.List;
 
 /**
  *
  * @author Ricardo
  */
 public interface Account {
-    int getValue();
-    void setValue(int value);
-    void addValue(int value);
-    void rmValue(int value);
+    void transfer(Account ac, int value);
+    void credit(int value);
+    void debit(int value);
+    List<String> getHistory();
+    String getId();
 }

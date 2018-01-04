@@ -5,7 +5,7 @@
  */
 package bookstore.Interfaces;
 
-import bookstore.Impl.BookImp;
+import bookstore.Impl.Book;
 
 import java.util.List;
 
@@ -14,7 +14,6 @@ import java.util.List;
  * @author Ricardo
  */
 public interface Store {
-    
     Book get(int isbn);
     Book search(String title) throws Exception;
     Cart newCart() throws Exception;

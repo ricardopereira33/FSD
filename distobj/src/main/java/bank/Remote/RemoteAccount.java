@@ -1,9 +1,10 @@
 package bank.Remote;
 
+import DO.ObjRef;
 import bank.Interfaces.Account;
-import bank.Rep.TransferRep;
-import bank.Req.TransferReq;
+import bank.Rep.*;
 import DO.Util;
+import bank.Req.*;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
@@ -11,6 +12,10 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import manager.Data.Context;
+import manager.Remote.RemoteManager;
+
+import java.util.List;
 
 public class RemoteAccount implements Account{
     private final ThreadContext tc;
@@ -33,28 +38,86 @@ public class RemoteAccount implements Account{
     }
 
     private void registeMsg() {
-        tc.serializer().register(TransferRep.class);
-        tc.serializer().register(TransferReq.class);
+        tc.serializer().register(newAccountRep.class);
+        tc.serializer().register(newAccountReq.class);
+    }
+
+    @Override
+    public void transfer(Account ac, int value) {
+        transferRep r = null;
+        Context ctx = RemoteManager.ctx.get();
+        ObjRef or = ((RemoteAccount )ac).getObjRef();
+        try {
+            r = (transferRep) tc.execute(() ->
+                    c.sendAndReceive(new transferReq(id, value, or, ctx))
+            ).join().get();
+
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
     }
 
 
     @Override
-    public int getValue() {
-        return 0;
+    public void credit(int value) {
+        creditRep r = null;
+        Context ctx = RemoteManager.ctx.get();
+        try {
+            r = (creditRep) tc.execute(() ->
+                    c.sendAndReceive(new creditReq(id, value, ctx))
+            ).join().get();
+
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
     }
 
     @Override
-    public void setValue(int value) {
+    public void debit(int value) {
+        debitRep r = null;
+        Context ctx = RemoteManager.ctx.get();
+        try {
+            r = (debitRep) tc.execute(() ->
+                    c.sendAndReceive(new debitReq(id, value, ctx))
+            ).join().get();
 
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
     }
 
     @Override
-    public void addValue(int value) {
-
+    public List<String> getHistory() {
+        historyRep r = null;
+        Context ctx = RemoteManager.ctx.get();
+        try {
+            r = (historyRep) tc.execute(() ->
+                    c.sendAndReceive(new historyReq(id, ctx))
+            ).join().get();
+            return r.list;
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+        return null;
     }
 
     @Override
-    public void rmValue(int value) {
+    public String getId() {
+        getIdRep r = null;
+        Context ctx = RemoteManager.ctx.get();
+        try {
+            r = (getIdRep) tc.execute(() ->
+                    c.sendAndReceive(new getIdReq(id, ctx))
+            ).join().get();
+            return r.id;
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
 
+        return null;
+    }
+
+    public ObjRef getObjRef(){
+        return new ObjRef(address, id, "Account");
     }
 }

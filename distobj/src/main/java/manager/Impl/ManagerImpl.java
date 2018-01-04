@@ -53,7 +53,7 @@ public class ManagerImpl{
 
         System.out.println("1: " + add[0]);
         System.out.println("2: " + add[1]);
-        System.out.println("3: " + add[2]);
+        //System.out.println("3: " + add[2]);
 
         tc.execute(() -> {
             cli.handler(Commit.class, (s, m) -> {

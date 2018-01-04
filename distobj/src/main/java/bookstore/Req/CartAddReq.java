@@ -1,5 +1,6 @@
 package bookstore.Req;
 
+import bookstore.Impl.Book;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
@@ -9,32 +10,28 @@ import manager.Data.Context;
 
 public class CartAddReq implements CatalystSerializable {
     public int cartid;
-    public int isbn;
-    public int txid;
-    public Address address;
+    public Book b;
+    public Context ctx;
 
     public CartAddReq(){}
     
-    public CartAddReq(int cartid, int isbn, Context ctx){
-        this.isbn = isbn;
+    public CartAddReq(int cartid, Book b, Context ctx){
+        this.b = b;
         this.cartid = cartid;
-        this.txid = ctx.getTxid();
-        this.address = ctx.getAddress();
+        this.ctx = ctx;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
-        bufferOutput.writeInt(isbn);
+        serializer.writeObject(b, bufferOutput);
         bufferOutput.writeInt(cartid);
-        bufferOutput.writeInt(txid);
-        serializer.writeObject(address, bufferOutput);
+        serializer.writeObject(ctx, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
-        isbn = bufferInput.readInt();
+        b = serializer.readObject(bufferInput);
         cartid = bufferInput.readInt();
-        txid = bufferInput.readInt();
-        address = serializer.readObject(bufferInput);
+        ctx = serializer.readObject(bufferInput);
     }
 }

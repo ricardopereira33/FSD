@@ -5,7 +5,6 @@
  */
 package bookstore.Impl;
 
-import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 import java.util.ArrayList;

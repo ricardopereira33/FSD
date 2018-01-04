@@ -1,46 +1,40 @@
 package bank.Req;
 
+import DO.ObjRef;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
-import io.atomix.catalyst.transport.Address;
 import manager.Data.Context;
 
-public class TransferReq implements CatalystSerializable {
-    public String recv, send;
-    public int value, bankid;
-    public int txid;
-    public Address address;
-    
-    public TransferReq() {}
+public class transferReq implements CatalystSerializable {
+    public int accountid;
+    public int value;
+    public ObjRef ref;
+    public Context ctx;
 
-    public TransferReq(String recv, String send, int value, int bankid, Context tx) {
-        this.recv = recv;
-        this.send = send;
+    public transferReq() {}
+
+    public transferReq(int id, int value, ObjRef ref, Context ctx) {
+        this.accountid = id;
         this.value = value;
-        this.bankid = bankid;
-        this.txid = tx.getTxid();
-        this.address = tx.getAddress();
+        this.ref = ref;
+        this.ctx = ctx;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
-        bufferOutput.writeString(recv);
-        bufferOutput.writeString(send);
+        bufferOutput.writeInt(accountid);
         bufferOutput.writeInt(value);
-        bufferOutput.writeInt(bankid);
-        bufferOutput.writeInt(txid);
-        serializer.writeObject(address, bufferOutput);
+        serializer.writeObject(ref, bufferOutput);
+        serializer.writeObject(ctx, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
-        recv = bufferInput.readString();
-        send = bufferInput.readString();
+        accountid = bufferInput.readInt();
         value = bufferInput.readInt();
-        bankid = bufferInput.readInt();
-        txid = bufferInput.readInt();
-        address = serializer.readObject(bufferInput);
+        ref = serializer.readObject(bufferInput);
+        ctx = serializer.readObject(bufferInput);
     }
 }

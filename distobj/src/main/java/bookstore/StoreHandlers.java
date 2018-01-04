@@ -3,8 +3,8 @@ package bookstore;
 import DO.DO;
 import DO.Backup;
 import DO.ObjRef;
+import bookstore.Impl.Book;
 import bookstore.Impl.StoreImp;
-import bookstore.Interfaces.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 import bookstore.Rep.CartAddRep;
@@ -30,6 +30,12 @@ import manager.Req.NewResourceReq;
 import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class StoreHandlers {
     private Transport t;
     private ThreadContext tc;
@@ -40,7 +46,8 @@ public class StoreHandlers {
     private ThreadContext tcManager;
     private Connection conManager;
     private Clique cli;
-    private Backup backup;
+    private HashMap<Integer, Object> volatilLog;
+    private AtomicInteger index;
 
     public StoreHandlers(Transport t, SingleThreadContext tc, Address address, DO d, Log log) {
         this.t = t;
@@ -52,7 +59,8 @@ public class StoreHandlers {
         this.tcManager = null;
         this.conManager = null;
         this.cli = null;
-        this.backup = null;
+        this.volatilLog = new HashMap<>();
+        this.index = new AtomicInteger(0);
     }
 
     public void exe(){
@@ -65,35 +73,52 @@ public class StoreHandlers {
     private void registLogHandlers() {
         tc.execute(() ->{
             log.handler(Prepare.class, (sender, msg)-> {
-                System.out.println("Log: Prepare");
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Commit.class, (sender, msg)-> {
-                System.out.println("Log: Commit");
-                update();
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Abort.class, (sender, msg)->{
-                System.out.println("Log: Abort");
-                this.backup = null;
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.handler(Backup.class, (sender, msg) -> {
-                System.out.println("Backup");
-                this.backup = msg;
+                int i = index.incrementAndGet();
+                volatilLog.put(i,msg);
             });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
+                //readLog();
                 Store s = new StoreImp();
                 d.oExport(s);
             });
         });
     }
 
-    private void update() {
-        this.d = this.backup.getD();
-        this.id = this.backup.getId();
-        this.tcManager = this.backup.getTc();
-        this.conManager = this.backup.getC();
-        this.cli = this.backup.getCli();
-        this.backup = null;
+    private void readLog() {
+        List<Object> list = new ArrayList<>();
+        for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
+            switch(e.getValue().getClass().getName()){
+                case "Prepare":
+                    System.out.println("Log: Prepare");
+                    break;
+                case "Commit":
+                    System.out.println("Log: Commit");
+                    list.stream().forEach((o) -> d.oExport(o));
+                    log.trim(e.getKey());
+                    break;
+                case "Abort":
+                    System.out.println("Log: Abort");
+                    list.clear();
+                    break;
+                case "Backup":
+                    System.out.println("Log: Backup");
+                    list.add(e.getValue());
+                    break;
+            }
+        }
     }
 
     private void registHandlers(Transport t, ThreadContext tc, Address address, DO d){
@@ -104,33 +129,29 @@ public class StoreHandlers {
                     Book b = null;
                     try{
                         b = s.search(m.title);
-                        registInManager(new Context(m.txid, m.address), s);
+                        registInManager(m.ctx, s);
                     }
-                    catch(Exception e){ System.out.println("SearchError: " + e.getMessage()); }
-                    ObjRef ref = d.oExport(b);
-                    registLog();
+                    catch(Exception e){ e.printStackTrace(); }
 
-                    return Futures.completedFuture(new StoreSearchRep(ref));
+                    return Futures.completedFuture(new StoreSearchRep(b));
                 });
                 c.handler(StoreMakeCartReq.class, (m) -> {
                     StoreImp s = (StoreImp) d.getElement(m.storeid);
                     Cart cart = null;
                     try{
                         cart = s.newCart();
-                        registInManager(new Context(m.txid, m.address), s);
+                        registInManager(m.ctx, s);
                     }
                     catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
                     ObjRef ref = d.oExport(cart);
-                    registLog();
 
                     return Futures.completedFuture(new StoreMakeCartRep(ref));
                 });
                 c.handler(CartAddReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
-                    Book b = (Book) d.getElement(m.isbn);
+                    Book b = m.b;
                     try {
-                        registInManager(new Context(m.txid, m.address), null);
-                        registLog();
+                        registInManager(m.ctx, null);
                     }
                     catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
 
@@ -139,8 +160,7 @@ public class StoreHandlers {
                 c.handler(CartBuyReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
                     try {
-                        registInManager(new Context(m.txid, m.address), null);
-                        registLog();
+                        registInManager(m.ctx, null);
                     }
                     catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
 
@@ -168,23 +188,14 @@ public class StoreHandlers {
         tc.serializer().register(Address.class);
         tc.serializer().register(NewResourceRep.class);
         tc.serializer().register(NewResourceReq.class);
-    }
-
-    private void registLog() {
-        Backup b = new Backup(d, tcManager, conManager, cli, id);
-        log.append(b);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(Book.class);
     }
 
     private void registInManager(Context ctx, StoreImp s) throws Exception {
         Transport t = new NettyTransport();
         if(tcManager == null) {
-            tcManager = new SingleThreadContext("srv-%d", new Serializer());
-            tcManager.serializer().register(NewResourceRep.class);
-            tcManager.serializer().register(NewResourceReq.class);
-            conManager = tcManager.execute( () ->
-                    t.client().connect(ctx.getAddress())
-            ).join().get();
-            createClique(ctx.getAddress(), s);
+           connectManager(ctx, s);
         }
         int managerid = 1;
         NewResourceRep r = null;
@@ -201,6 +212,16 @@ public class StoreHandlers {
         this.id = r.idRes;
     }
 
+    private void connectManager(Context ctx, StoreImp s) throws Exception {
+        tcManager = new SingleThreadContext("srv-%d", new Serializer());
+        tcManager.serializer().register(NewResourceRep.class);
+        tcManager.serializer().register(NewResourceReq.class);
+        conManager = tcManager.execute( () ->
+                t.client().connect(ctx.getAddress())
+        ).join().get();
+        createClique(ctx.getAddress(), s);
+    }
+
     private void createClique(Address address, StoreImp si) {
         Transport tr = new NettyTransport();
         ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
@@ -211,6 +232,7 @@ public class StoreHandlers {
         tc.execute(()->{
             cli.handler(Prepare.class, (s, m) -> {
                 System.out.println("Prepare");
+                // fazer cenas ! meter as cenas no log aqui
                 log.append(m);
                 cli.send(s,new Ok("Ok"));
             });
@@ -222,8 +244,6 @@ public class StoreHandlers {
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
                 si.unlock();
-                update();
-                this.backup = null;
             });
             cli.open().thenRun(() ->{
                 System.out.println("2PC begin.");
@@ -249,4 +269,5 @@ public class StoreHandlers {
 
         return list;
     }
+
 }

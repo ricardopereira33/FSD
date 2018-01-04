@@ -14,12 +14,19 @@ public class Server {
         //Initial settings
         Transport t = new NettyTransport();
         SingleThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
-        Address address = new Address(":1235");
-        DO d = new DO(new Address("127.0.0.1:1235"));
+
+        //int id = Integer.parseInt(args[0]);
+        //System.out.println("id: " + id);
+
+        Address[] address = new Address[]{
+                new Address("127.0.0.1:1135"),
+                new Address("127.0.0.1:2134"),
+        };
+        DO d = new DO(address[0]);
         Log log = new Log("log_bookstore");
 
         // Regist Messages and Handlers
-        StoreHandlers sh = new StoreHandlers(t, tc, address, d, log);
+        StoreHandlers sh = new StoreHandlers(t, tc, address[0], d, log);
         sh.exe();
     }
 }
