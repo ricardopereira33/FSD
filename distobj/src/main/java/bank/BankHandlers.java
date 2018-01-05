@@ -55,8 +55,9 @@ public class BankHandlers extends Server {
                         registInManager(m.ctx, b);
                     }
                     catch(Exception e){ e.printStackTrace();}
+                    ObjRef or = d.oExport((Obj) ac);
 
-                    return Futures.completedFuture(new accessRep(d.oExport((Obj) ac)));
+                    return Futures.completedFuture(new accessRep(or));
                 });
                 c.handler(transferReq.class, (m) -> {
                     Account ac = (Account) d.getElement(m.accountid);

@@ -18,6 +18,7 @@ import manager.Data.Context;
 public class Prepare implements CatalystSerializable {
     public String s;
     public Context ctx;
+    public int idRes;
 
     public Prepare() {}
 

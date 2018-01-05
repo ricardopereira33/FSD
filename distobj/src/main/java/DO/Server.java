@@ -18,7 +18,6 @@ import pt.haslab.ekit.Log;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Server {
@@ -80,12 +79,14 @@ public abstract class Server {
     public void readLog() {
         Map<Integer, Obj> list = new HashMap<>();
         boolean prepared = false;
+        int idLocked;
         Context ctx = null;
         for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
             switch(e.getValue().getClass().getName()){
                 case "log.Prepare":
                     System.out.println("Log: Prepare");
                     prepared = true;
+                    idLocked = ((Prepare) e.getValue()).idRes;
                     ctx = ((Prepare) e.getValue()).ctx;
                     break;
                 case "log.Commit":
@@ -127,11 +128,14 @@ public abstract class Server {
     }
 
     public void registInManager(Context ctx, Obj o) throws Exception {
+        // connect to the manager
         Transport t = new NettyTransport();
         if(tcManager == null) {
             connectManager(ctx, o);
         }
         int managerid = 1;
+
+        // registe resource
         NewResourceRep r = null;
         try{
             r = (NewResourceRep) tcManager.execute( () ->
@@ -139,12 +143,14 @@ public abstract class Server {
             ).join().get();
         }
         catch (Exception e){ e.printStackTrace(); }
-
         this.id = r.idRes;
+
+        // create the Clique for 2PC
         if(cli == null){
             createClique(ctx.getAddress(), o);
         }
 
+        // lock resource
         if(o != null)
             o.lock();
     }
@@ -168,11 +174,9 @@ public abstract class Server {
         tc.execute(()-> {
             cli.handler(Prepare.class, (s, m) -> {
                 System.out.println("Prepare");
-                try{log.append(m);
-                    System.out.println("Enviou");
-                    cli.send(s, new Ok("Ok"));
-                }catch(Exception e){ e.printStackTrace();}
-
+                m.idRes = si.getIdRes();
+                log.append(m);
+                cli.send(s, new Ok("Ok"));
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");

@@ -38,12 +38,13 @@ public class DO {
         this.id = new AtomicInteger(0);
     }
 
-    public Object getElement(int index){
+    public Obj getElement(int index){
         return objs.get(index);
     }
 
     public ObjRef oExport(Obj o){
         int idOR = id.incrementAndGet();
+        o.setIdRes(idOR);
         objs.put(idOR, o);
 
         return new ObjRef(address, idOR, o.getClass().getSimpleName());

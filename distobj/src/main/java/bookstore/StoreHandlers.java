@@ -40,10 +40,10 @@ public class StoreHandlers extends Server {
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
                 c.handler(StoreSearchReq.class, (m) -> {
-                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    Obj s = d.getElement(m.storeid);
                     Book b = null;
                     try{
-                        b = s.search(m.title);
+                        b = ((StoreImp) s).search(m.title);
                         registInManager(m.ctx, s);
                     }
                     catch(Exception e){ e.printStackTrace(); }
@@ -51,22 +51,22 @@ public class StoreHandlers extends Server {
                     return Futures.completedFuture(new StoreSearchRep(b));
                 });
                 c.handler(StoreMakeCartReq.class, (m) -> {
-                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    Obj s = d.getElement(m.storeid);
                     Cart cart = null;
                     try{
-                        cart = s.newCart();
+                        cart = ((StoreImp) s).newCart();
                         registInManager(m.ctx, s);
                     }
                     catch(Exception e){ e.printStackTrace(); }
                     ObjRef ref = d.oExport((Obj) cart);
-                    log.append(new Backup(ref.id, (Obj) cart));
+                    log.append(new Backup(ref.id, d.getElement(ref.id)));
 
                     return Futures.completedFuture(new StoreMakeCartRep(ref));
                 });
                 c.handler(addHistoryReq.class, (m) -> {
-                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    Obj s = d.getElement(m.storeid);
                     try{
-                        s.addHistory(m.value, m.list);
+                        ((StoreImp) s).addHistory(m.value, m.list);
                         registInManager(m.ctx, s);
                     }
                     catch(Exception e){ e.printStackTrace(); }
@@ -75,24 +75,24 @@ public class StoreHandlers extends Server {
                     return Futures.completedFuture(new addHistoryRep(true));
                 });
                 c.handler(CartAddReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
+                    Obj cart = d.getElement(m.cartid);
                     Book b = m.b;
                     try {
                         registInManager(m.ctx, null);
                     }
                     catch (Exception e) { e.printStackTrace(); }
-                    boolean ok = cart.add(b);
-                    log.append(new Backup(m.cartid, (Obj) cart));
+                    boolean ok = ((Cart) cart).add(b);
+                    log.append(new Backup(m.cartid, cart));
 
                     return Futures.completedFuture(new CartAddRep(ok));
                 });
                 c.handler(CartBuyReq.class, (m) -> {
-                    Cart cart = (Cart) d.getElement(m.cartid);
+                    Obj cart = d.getElement(m.cartid);
                     try {
                         registInManager(m.ctx, null);
                     }
                     catch (Exception e) { e.printStackTrace(); }
-                    Invoice i = cart.buy();
+                    Invoice i = ((Cart) cart).buy();
                     log.append(new Backup(m.cartid, (Obj) cart));
 
                     return Futures.completedFuture(new CartBuyRep(true, i));
