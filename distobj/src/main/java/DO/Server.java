@@ -171,7 +171,7 @@ public abstract class Server {
                 System.out.println("Prepare");
                 m.idRes = si.getIdRes();
                 log.append(m);
-                cli.send(s, new Ok("Ok"));
+                //cli.send(s, new Ok("Ok"));
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");

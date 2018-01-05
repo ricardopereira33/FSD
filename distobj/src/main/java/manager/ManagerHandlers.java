@@ -60,6 +60,12 @@ public class ManagerHandlers {
             l.handler(Abort.class, (sender, msg)-> {
                 addToVolatil(msg);
             });
+            l.handler(Begin.class, (sender, msg) ->{
+                addToVolatil(msg);
+            });
+            l.handler(Backup.class, (sender,msg) ->{
+                addToVolatil(msg);
+            });
             l.open().thenRun(()-> {
                 System.out.println("ServerManager running... ");
                 readLog();
@@ -79,10 +85,11 @@ public class ManagerHandlers {
         Begin begin = null;
         for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
             switch(e.getValue().getClass().getName()){
-                case "Begin":
+                case "log.Begin":
                     System.out.println("Log: Begin");
                     beginning = true;
                     begin = (Begin) e.getValue();
+                    break;
                 case "log.Commit":
                     System.out.println("Log: Commit");
                     beginning = false;
@@ -102,6 +109,7 @@ public class ManagerHandlers {
             }
         }
         if(beginning && !list.isEmpty()){
+            System.out.println("Entrei");
             d.update(list);
             ManagerImpl mi = (ManagerImpl) d.getElement(begin.managerid);
             mi.start2PC(begin.txid, address, l);
@@ -117,6 +125,7 @@ public class ManagerHandlers {
                     int txid = ((ManagerImpl) txs).newTransation(address);
 
                     l.append(new Begin("Begin", txid, m.managerid));
+
                     l.append(new Backup(m.managerid, txs));
 
                     return Futures.completedFuture(new ContextRep(txid, address));

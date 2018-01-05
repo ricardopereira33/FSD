@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Fri Jan 05 21:33:20 WET 2018:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0160-c83e-1432-000002edaf30 
+Fri Jan 05 21:53:25 WET 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0160-c850-7930-000002ed8758 
 on database directory /Users/Ricardo/Documents/Git/FSD/distobj/log_manager with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 Loaded from file:/Users/Ricardo/.m2/repository/org/apache/derby/derby/10.13.1.1/derby-10.13.1.1.jar
 java.vendor=Oracle Corporation
