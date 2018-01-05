@@ -27,11 +27,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Server.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="Server.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/DO/Server.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="116">
-                  <caret line="173" column="18" lean-forward="false" selection-start-line="173" selection-start-column="18" selection-end-line="173" selection-end-column="18" />
+                  <caret line="173" column="16" lean-forward="false" selection-start-line="173" selection-start-column="16" selection-end-line="173" selection-end-column="16" />
                   <folding>
                     <element signature="method#getAddress#0;class#Server#0" expanded="false" />
                     <element signature="method#registMsg#0;class#Server#0" expanded="false" />
@@ -40,11 +40,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ManagerHandlers.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="ManagerHandlers.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/manager/ManagerHandlers.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="209">
-                  <caret line="138" column="0" lean-forward="false" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+                <state relative-caret-position="464">
+                  <caret line="148" column="0" lean-forward="true" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="method#registMsg#0;class#ManagerHandlers#0" expanded="false" />
@@ -57,21 +57,11 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="ServerManager.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="ServerManager.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/manager/ServerManager.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="225">
                   <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="ManagerImpl.java" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="348">
-                  <caret line="97" column="31" lean-forward="false" selection-start-line="97" selection-start-column="31" selection-end-line="97" selection-end-column="31" />
                   <folding />
                 </state>
               </provider>
@@ -145,9 +135,9 @@
         <option value="$PROJECT_DIR$/src/main/java/log/AskManagerRep.java" />
         <option value="$PROJECT_DIR$/src/main/java/log/Begin.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java" />
-        <option value="$PROJECT_DIR$/src/main/java/DO/Server.java" />
         <option value="$PROJECT_DIR$/src/main/java/manager/ManagerHandlers.java" />
         <option value="$PROJECT_DIR$/src/main/java/Client.java" />
+        <option value="$PROJECT_DIR$/src/main/java/DO/Server.java" />
       </list>
     </option>
   </component>
@@ -538,12 +528,12 @@
       <workItem from="1515060447187" duration="772000" />
       <workItem from="1515061300131" duration="49812000" />
       <workItem from="1515145849598" duration="539000" />
-      <workItem from="1515146573738" duration="36511000" />
+      <workItem from="1515146573738" duration="36758000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="181340000" />
+    <option name="totallyTimeSpent" value="181587000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -938,28 +928,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/DO/Server.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="173" column="18" lean-forward="false" selection-start-line="173" selection-start-column="18" selection-end-line="173" selection-end-column="18" />
-          <folding>
-            <element signature="method#getAddress#0;class#Server#0" expanded="false" />
-            <element signature="method#registMsg#0;class#Server#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/manager/ServerManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/manager/Impl/ManagerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
+        <state relative-caret-position="921">
           <caret line="97" column="31" lean-forward="false" selection-start-line="97" selection-start-column="31" selection-end-line="97" selection-end-column="31" />
           <folding />
         </state>
@@ -993,11 +964,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/manager/ManagerHandlers.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="138" column="0" lean-forward="false" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+        <state relative-caret-position="464">
+          <caret line="148" column="0" lean-forward="true" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#registMsg#0;class#ManagerHandlers#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/manager/ServerManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/DO/Server.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="173" column="16" lean-forward="false" selection-start-line="173" selection-start-column="16" selection-end-line="173" selection-end-column="16" />
+          <folding>
+            <element signature="method#getAddress#0;class#Server#0" expanded="false" />
+            <element signature="method#registMsg#0;class#Server#0" expanded="false" />
           </folding>
         </state>
       </provider>
