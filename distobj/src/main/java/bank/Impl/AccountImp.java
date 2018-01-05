@@ -5,6 +5,7 @@
  */
 package bank.Impl;
 
+import DO.Obj;
 import bank.Interfaces.Account;
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
@@ -18,12 +19,13 @@ import java.util.List;
  *
  * @author Ricardo
  */
-public class AccountImp implements Account, CatalystSerializable {
+public class AccountImp extends Obj implements Account, CatalystSerializable {
     private String id;
     private List<String> history;
     private int value;
 
     public AccountImp(String id, int value){
+        super();
         this.id = id;
         this.value = value;
         this.history = new ArrayList<>();

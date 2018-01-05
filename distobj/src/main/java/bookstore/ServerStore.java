@@ -15,9 +15,6 @@ public class ServerStore {
         Transport t = new NettyTransport();
         SingleThreadContext tc = new SingleThreadContext("srv-%d", new Serializer());
 
-        //int id = Integer.parseInt(args[0]);
-        //System.out.println("id: " + id);
-
         Address[] address = new Address[]{
                 new Address("127.0.0.1:1135"),
                 new Address("127.0.0.1:2134"),

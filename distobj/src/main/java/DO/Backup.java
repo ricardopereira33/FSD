@@ -11,11 +11,11 @@ import pt.haslab.ekit.Clique;
 
 public class Backup implements CatalystSerializable{
     private int id;
-    private Object o;
+    private Obj o;
 
     public Backup(){}
 
-    public Backup(int id, Object o){
+    public Backup(int id, Obj o){
         this.id = id;
         this.o = o;
     }
@@ -28,11 +28,11 @@ public class Backup implements CatalystSerializable{
         this.id = id;
     }
 
-    public Object getO() {
+    public Obj getO() {
         return o;
     }
 
-    public void setO(Object o) {
+    public void setO(Obj o) {
         this.o = o;
     }
 

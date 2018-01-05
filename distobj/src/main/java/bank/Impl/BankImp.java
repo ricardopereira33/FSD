@@ -1,5 +1,6 @@
 package bank.Impl;
 
+import DO.Obj;
 import bank.Interfaces.Account;
 import bank.Interfaces.Bank;
 import io.atomix.catalyst.buffer.BufferInput;
@@ -11,13 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class BankImp implements Bank, CatalystSerializable {
+public class BankImp extends Obj implements Bank, CatalystSerializable {
     public Map<String, Account> accounts;
-    private ReentrantLock lock;
 
     public BankImp() {
+        super();
         accounts = new HashMap<>();
-        this.lock = new ReentrantLock();
     }
 
     @Override
@@ -30,14 +30,6 @@ public class BankImp implements Bank, CatalystSerializable {
         else ac = accounts.get(id);
 
         return ac;
-    }
-
-    public void lock() {
-        this.lock.lock();
-    }
-
-    public void unlock(){
-        this.lock.unlock();
     }
 
     @Override

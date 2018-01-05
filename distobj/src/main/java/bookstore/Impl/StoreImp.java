@@ -1,5 +1,6 @@
 package bookstore.Impl;
 
+import DO.Obj;
 import bookstore.Data.Sale;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
@@ -14,17 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class StoreImp implements Store, CatalystSerializable {
+public class StoreImp extends Obj implements Store, CatalystSerializable {
     public Map<Integer, Book> books;
     public List<Sale> history;
-    public ReentrantLock lock;
 
     public StoreImp() {
+        super();
         books = new HashMap<>();
         history = new ArrayList<>();
         books.put(1, new Book(1, "one", "someone", 10));
         books.put(2, new Book(2, "other", "someother", 20));
-        lock = new ReentrantLock();
     }
 
     @Override
@@ -48,14 +48,6 @@ public class StoreImp implements Store, CatalystSerializable {
     @Override
     public void addHistory(int value, List<Book> content) {
         history.add(new Sale(value, content));
-    }
-
-    public void lock() {
-        this.lock.lock();
-    }
-
-    public void unlock(){
-        this.lock.unlock();
     }
 
     @Override

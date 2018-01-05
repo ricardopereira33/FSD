@@ -1,6 +1,7 @@
 package manager;
 
 import DO.DO;
+import DO.Obj;
 import io.atomix.catalyst.concurrent.Futures;
 import log.*;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
@@ -46,7 +47,7 @@ public class ServerManager {
             });
             l.open().thenRun(()-> { 
                 System.out.println("ServerManager running... ");
-                ManagerImpl txs = new ManagerImpl(l);
+                Obj txs = new ManagerImpl(l);
                 d.oExport(txs);
 
                 registMsg(tc);

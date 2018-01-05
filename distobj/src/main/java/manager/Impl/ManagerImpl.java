@@ -1,5 +1,8 @@
 package manager.Impl;
 
+import DO.Obj;
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
@@ -18,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class ManagerImpl{
+public class ManagerImpl extends Obj {
     private Map<Integer, Transation> trans;
     private int count;
     private ThreadContext tc;
@@ -26,6 +29,7 @@ public class ManagerImpl{
     private Log log;
 
     public ManagerImpl(Log log) {
+        super();
         this.trans = new HashMap<>();
         this.count = 1;
         this.tc = new SingleThreadContext("proto-%d", new Serializer());
@@ -72,6 +76,7 @@ public class ManagerImpl{
                 IntStream.range(1, add.length)
                         .forEach(i -> cli.send(i, new Prepare("Prepare", new Context(txid, ad))));
             });
+            cli.onException((e) -> e.printStackTrace());
         }).join();
         return true;
     }
@@ -88,5 +93,15 @@ public class ManagerImpl{
                         .forEach(i -> cli.send(i, new Commit("Commit")));
             }
         }
+    }
+
+    @Override
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+
     }
 }

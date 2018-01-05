@@ -5,6 +5,7 @@
  */
 package bookstore.Impl;
 
+import DO.Obj;
 import bank.Data.Invoice;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
@@ -20,13 +21,14 @@ import java.util.List;
  *
  * @author Ricardo
  */
-public class CartImp implements Cart, CatalystSerializable {
+public class CartImp extends Obj implements Cart, CatalystSerializable {
     private List<Book> content;
     private Store s;
 
     public CartImp(){}
 
     public CartImp(Store s){
+        super();
         content = new ArrayList<>();
         this.s = (Store) s;
     }

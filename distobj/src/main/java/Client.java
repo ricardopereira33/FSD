@@ -45,6 +45,5 @@ public class Client {
 
         m.commit();
         System.out.println("End.");
-
     }
 }

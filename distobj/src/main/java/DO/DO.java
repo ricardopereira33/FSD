@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DO {
     private Address address;
     private Util u;
-    private Map<Integer, Object> objs;
+    private Map<Integer, Obj> objs;
     private AtomicInteger id;
 
     public DO(){
@@ -42,7 +42,7 @@ public class DO {
         return objs.get(index);
     }
 
-    public ObjRef oExport(Object o){
+    public ObjRef oExport(Obj o){
         int idOR = id.incrementAndGet();
         objs.put(idOR, o);
 
@@ -65,7 +65,7 @@ public class DO {
 
     public DO clone(){
         DO res = new DO(this.address);
-        for(Object o: objs.values()){
+        for(Obj o: objs.values()){
             res.oExport(o);
         }
         return res;
@@ -73,5 +73,11 @@ public class DO {
 
     public void print() {
         objs.values().stream().forEach((o) -> System.out.println("Obj: "+o));
+    }
+
+    public void update(Map<Integer, Obj> list) {
+        for(Map.Entry<Integer, Obj> e : list.entrySet()){
+            objs.put(e.getKey(), e.getValue());
+        }
     }
 }
