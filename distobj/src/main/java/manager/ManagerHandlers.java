@@ -176,6 +176,5 @@ public class ManagerHandlers {
         tc.serializer().register(Obj.class);
         tc.serializer().register(Context.class);
         tc.serializer().register(Begin.class);
-        tc.serializer().register(Begin2PC.class);
     }
 }

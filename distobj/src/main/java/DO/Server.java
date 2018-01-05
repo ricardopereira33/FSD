@@ -32,6 +32,7 @@ public abstract class Server {
     public Clique cli;
     public HashMap<Integer, Object> volatilLog;
     public AtomicInteger index;
+    public Snapshot snap;
     private boolean prepared;
 
     public Server(){}
@@ -49,6 +50,7 @@ public abstract class Server {
         this.volatilLog = new HashMap<>();
         this.index = new AtomicInteger(0);
         this.prepared = false;
+        this.snap = null;
         registMsg();
         registLogHandlers();
     }
@@ -127,6 +129,7 @@ public abstract class Server {
         Transport t = new NettyTransport();
         if(tcManager == null) {
             connectManager(ctx, o);
+            snap = new Snapshot(d);
         }
         int managerid = 1;
 
@@ -180,6 +183,7 @@ public abstract class Server {
             });
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");
+                rollback();
                 si.unlock();
             });
             cli.open().thenRun(() -> {
@@ -190,6 +194,10 @@ public abstract class Server {
             });
             cli.onException((e) -> e.printStackTrace());
         }).join();
+    }
+
+    public void rollback(){
+        this.d = snap.getD();
     }
 
     public Address[] getAddress(Address address) {
