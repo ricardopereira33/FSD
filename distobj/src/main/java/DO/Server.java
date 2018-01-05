@@ -32,6 +32,7 @@ public abstract class Server {
     public Clique cli;
     public HashMap<Integer, Object> volatilLog;
     public AtomicInteger index;
+    private boolean prepared;
 
     public Server(){}
 
@@ -47,6 +48,7 @@ public abstract class Server {
         this.cli = null;
         this.volatilLog = new HashMap<>();
         this.index = new AtomicInteger(0);
+        this.prepared = false;
         registMsg();
         registLogHandlers();
     }
@@ -78,8 +80,7 @@ public abstract class Server {
 
     public void readLog() {
         Map<Integer, Obj> list = new HashMap<>();
-        boolean prepared = false;
-        int idLocked;
+        int idLocked = 1;
         Context ctx = null;
         for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
             switch(e.getValue().getClass().getName()){
@@ -107,24 +108,18 @@ public abstract class Server {
                     break;
             }
         }
-        if(prepared){
-            System.out.println("Ask manager !!");
-        }
+        checkStatus(ctx, idLocked, list);
     }
 
-    private void registMsg(){
-        tc.serializer().register(ObjRef.class);
-        tc.serializer().register(Abort.class);
-        tc.serializer().register(Commit.class);
-        tc.serializer().register(Ok.class);
-        tc.serializer().register(Prepare.class);
-        tc.serializer().register(Rollback.class);
-        tc.serializer().register(Address.class);
-        tc.serializer().register(Context.class);
-        tc.serializer().register(Book.class);
-        tc.serializer().register(Invoice.class);
-        tc.serializer().register(NewResourceRep.class);
-        tc.serializer().register(NewResourceReq.class);
+    private void checkStatus(Context ctx, int idLocked, Map<Integer, Obj> list) {
+        if(prepared){
+            Obj o = d.getElement(idLocked);
+            try {
+                d.update(list);
+                registInManager(ctx, o);
+            }
+            catch (Exception e){ e.printStackTrace(); }
+        }
     }
 
     public void registInManager(Context ctx, Obj o) throws Exception {
@@ -169,7 +164,7 @@ public abstract class Server {
         ThreadContext tc = new SingleThreadContext("proto-%d", new Serializer());
         Address[] addrs = getAddress(address);
 
-        this.cli = new Clique(tr, id, addrs);
+        this.cli = new Clique(tr, Clique.Mode.ANY, id, addrs);
 
         tc.execute(()-> {
             cli.handler(Prepare.class, (s, m) -> {
@@ -189,6 +184,9 @@ public abstract class Server {
             });
             cli.open().thenRun(() -> {
                 System.out.println("2PC begin.");
+                if(prepared){
+                    cli.send(0, new Ok("Ok"));
+                }
             });
             cli.onException((e) -> e.printStackTrace());
         }).join();
@@ -211,5 +209,20 @@ public abstract class Server {
         list[id] = own;
 
         return list;
+    }
+
+    private void registMsg(){
+        tc.serializer().register(ObjRef.class);
+        tc.serializer().register(Abort.class);
+        tc.serializer().register(Commit.class);
+        tc.serializer().register(Ok.class);
+        tc.serializer().register(Prepare.class);
+        tc.serializer().register(Rollback.class);
+        tc.serializer().register(Address.class);
+        tc.serializer().register(Context.class);
+        tc.serializer().register(Book.class);
+        tc.serializer().register(Invoice.class);
+        tc.serializer().register(NewResourceRep.class);
+        tc.serializer().register(NewResourceReq.class);
     }
 }

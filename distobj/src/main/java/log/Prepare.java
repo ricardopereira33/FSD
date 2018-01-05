@@ -25,17 +25,20 @@ public class Prepare implements CatalystSerializable {
     public Prepare(String s, Context ctx){
         this.s = s;
         this.ctx = ctx;
+        this.idRes = 0;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
         bo.writeString(s);
         srlzr.writeObject(ctx, bo);
+        bo.writeInt(idRes);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         s = bi.readString();
         ctx = srlzr.readObject(bi);
+        idRes = bi.readInt();
     }
 }

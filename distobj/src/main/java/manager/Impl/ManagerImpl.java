@@ -12,7 +12,6 @@ import io.atomix.catalyst.transport.netty.NettyTransport;
 import log.*;
 import manager.Data.Context;
 import manager.Data.Transation;
-import manager.Interfaces.Manager;
 import pt.haslab.ekit.Clique;
 import pt.haslab.ekit.Log;
 
@@ -26,7 +25,15 @@ public class ManagerImpl extends Obj {
     private int count;
     private ThreadContext tc;
     private Transport tran;
-    private Log log;
+    private Clique cli;
+
+    public ManagerImpl(){
+        this.trans = new HashMap<>();
+        this.count = 1;
+        this.tc = new SingleThreadContext("proto-%d", new Serializer());
+        this.tran = new NettyTransport();
+        this.cli = null;
+    }
 
     public ManagerImpl(Log log) {
         super();
@@ -34,7 +41,7 @@ public class ManagerImpl extends Obj {
         this.count = 1;
         this.tc = new SingleThreadContext("proto-%d", new Serializer());
         this.tran = new NettyTransport();
-        this.log = log;
+        this.cli = null;
     }
 
     public int newTransation(Address addrs){
@@ -49,18 +56,14 @@ public class ManagerImpl extends Obj {
         return t.addAddress(address.port(), address);
     }
 
-    public boolean start2PC(int txid, Address ad) {
+    public boolean start2PC(int txid, Address ad, Log log) {
         Transation t = trans.get(txid);
         List<Address> list = t.getAddress();
         Address[] add = list.toArray(new Address[list.size()]);
 
-        Clique cli = new Clique(tran,0,add);
+        cli = new Clique(tran,0,add);
 
         tc.execute(() -> {
-            cli.handler(Commit.class, (s, m) -> {
-                System.out.println("com");
-                log.append(m);
-            });
             cli.handler(Abort.class, (s, m) -> {
                 System.out.println("Abort");
                 Transation tt = trans.get(txid);
@@ -69,7 +72,7 @@ public class ManagerImpl extends Obj {
             });
             cli.handler(Ok.class, (s, m) -> {
                 System.out.println("Ok");
-                checkTransation(txid, cli, add.length);
+                checkTransation(txid, cli, add.length, s, log);
             });
             cli.open().thenRun(() -> {
                 System.out.println("open");
@@ -81,27 +84,31 @@ public class ManagerImpl extends Obj {
         return true;
     }
 
-    public void checkTransation(int txid, Clique cli, int size){
+    public void checkTransation(int txid, Clique cli, int size, int resource, Log log){
         Transation t = trans.get(txid);
-        if(t.arrived()){
+        if(t.arrived(resource)){
             if(!t.isValid()){
                 IntStream.range(1, size)
                         .forEach(i -> cli.send(i, new Rollback("Rollback")));
+                log.append(new Abort("Abort"));
             }
             else{
                 IntStream.range(1, size)
                         .forEach(i -> cli.send(i, new Commit("Commit")));
+                log.append(new Commit("Commit"));
             }
         }
     }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
-
+        bufferOutput.writeInt(count);
+        serializer.writeObject(trans, bufferOutput);
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
-
+        count = bufferInput.readInt();
+        trans = serializer.readObject(bufferInput);
     }
 }

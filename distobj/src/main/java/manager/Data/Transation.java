@@ -1,5 +1,9 @@
 package manager.Data;
 
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.CatalystSerializable;
+import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 
@@ -8,19 +12,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Transation {
+public class Transation implements CatalystSerializable{
     private int id;
-    private int regist;
+    private List<Integer> regist;
+    private Map<Integer, Integer> registId;
     private int idRes;
     private Map<Integer, Address> address;
     private boolean valid;
 
+    public Transation(){}
+
     public Transation(int count, Address addrs) {
         this.id = count;
-        this.regist = 0;
+        this.regist = new ArrayList<>();
+        this.regist.add(0);
         this.address = new HashMap<>();
-        this.address.put(regist, new Address(addrs.host()+":"+(addrs.port()+1)));
-        regist++;
+        this.registId = new HashMap<>();
+        this.address.put(0, new Address(addrs.host()+":"+(addrs.port()+1)));
         this.valid = true;
         this.idRes = 0;
     }
@@ -29,8 +37,9 @@ public class Transation {
         if(!this.address.containsKey(id)){
             this.address.put(id, new Address(address.host()+":"+(address.port()+1)));
             idRes++;
+            this.registId.put(id, idRes);
         }
-        return idRes;
+        return this.registId.get(id);
     }
 
     public List<Address> getAddress(){
@@ -38,14 +47,12 @@ public class Transation {
         return list;
     }
 
-    public int getSize() {
-        return address.size();
-    }
+    public boolean arrived(int resource) {
+        if(!regist.contains(resource))
+            regist.add(resource);
 
-    public boolean arrived() {
-        regist++;
-        if(regist == address.size()){
-            regist = 0;
+        if(regist.size() == address.size()){
+            regist.clear();
             return true;
         }
         return false;
@@ -57,5 +64,25 @@ public class Transation {
 
     public boolean isValid() {
         return valid;
+    }
+
+    @Override
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+        bufferOutput.writeInt(id);
+        serializer.writeObject(regist, bufferOutput);
+        serializer.writeObject(registId, bufferOutput);
+        bufferOutput.writeInt(idRes);
+        serializer.writeObject(address, bufferOutput);
+        bufferOutput.writeBoolean(valid);
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+        id = bufferInput.readInt();
+        regist = serializer.readObject(bufferInput);
+        registId = serializer.readObject(bufferInput);
+        idRes = bufferInput.readInt();
+        address = serializer.readObject(bufferInput);
+        valid = bufferInput.readBoolean();
     }
 }

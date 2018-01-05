@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Fri Jan 05 16:07:37 WET 2018:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0160-c713-e26d-0000044f9c18 
-on database directory /Users/Ricardo/Documents/Git/FSD/distobj/log_bank with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
+Fri Jan 05 21:33:20 WET 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0160-c83e-1432-000002edaf30 
+on database directory /Users/Ricardo/Documents/Git/FSD/distobj/log_manager with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
 Loaded from file:/Users/Ricardo/.m2/repository/org/apache/derby/derby/10.13.1.1/derby-10.13.1.1.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_74-b02
