@@ -17,4 +17,5 @@ public interface Store {
     Book get(int isbn);
     Book search(String title) throws Exception;
     Cart newCart() throws Exception;
+    void addHistory(int value, List<Book> content);
 }

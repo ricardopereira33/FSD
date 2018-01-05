@@ -9,56 +9,42 @@ import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Connection;
 import pt.haslab.ekit.Clique;
 
-public class Backup {
+public class Backup implements CatalystSerializable{
     private int id;
-    private DO d;
-    private ThreadContext tc;
-    private Connection c;
-    private Clique cli;
+    private Object o;
 
     public Backup(){}
 
-    public Backup(DO d, ThreadContext tc, Connection c, Clique cli, int id){
-        this.d  = d.clone();
-        setConnects(tc,c,cli);
+    public Backup(int id, Object o){
         this.id = id;
-    }
-
-    public DO getD() {
-        return d;
-    }
-
-    public ThreadContext getTc() {
-        return tc;
-    }
-
-    public Connection getC() {
-        return c;
-    }
-
-    public Clique getCli() {
-        return cli;
+        this.o = o;
     }
 
     public int getId() {
         return id;
     }
 
-    public void update(DO d, ThreadContext tcManager, Connection conManager, Clique cli, int id) {
-        this.d  = d.clone();
-        setConnects(tcManager,conManager,cli);
+    public void setId(int id) {
         this.id = id;
     }
 
-    private void setConnects(ThreadContext tc, Connection c, Clique cli){
-        if(tc != null)
-            this.tc = tc;
-        else this.tc = null;
-        if(tc != null)
-            this.c = c;
-        else this.c = null;
-        if(tc != null)
-            this.cli = cli;
-        else this.cli = null;
+    public Object getO() {
+        return o;
+    }
+
+    public void setO(Object o) {
+        this.o = o;
+    }
+
+    @Override
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+        bufferOutput.writeInt(id);
+        serializer.writeObject(o, bufferOutput);
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+        id = bufferInput.readInt();
+        o = serializer.readObject(bufferInput);
     }
 }

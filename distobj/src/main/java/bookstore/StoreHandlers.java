@@ -5,17 +5,12 @@ import DO.Backup;
 import DO.ObjRef;
 import bank.Data.Invoice;
 import bookstore.Impl.Book;
+import bookstore.Impl.CartImp;
 import bookstore.Impl.StoreImp;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
-import bookstore.Rep.CartAddRep;
-import bookstore.Rep.CartBuyRep;
-import bookstore.Rep.StoreMakeCartRep;
-import bookstore.Rep.StoreSearchRep;
-import bookstore.Req.CartAddReq;
-import bookstore.Req.CartBuyReq;
-import bookstore.Req.StoreMakeCartReq;
-import bookstore.Req.StoreSearchReq;
+import bookstore.Rep.*;
+import bookstore.Req.*;
 import io.atomix.catalyst.concurrent.Futures;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
@@ -74,51 +69,62 @@ public class StoreHandlers {
     private void registLogHandlers() {
         tc.execute(() ->{
             log.handler(Prepare.class, (sender, msg)-> {
-                int i = index.incrementAndGet();
-                volatilLog.put(i,msg);
+                addToVolatil(msg);
             });
             log.handler(Commit.class, (sender, msg)-> {
-                int i = index.incrementAndGet();
-                volatilLog.put(i,msg);
+                addToVolatil(msg);
             });
             log.handler(Abort.class, (sender, msg)->{
-                int i = index.incrementAndGet();
-                volatilLog.put(i,msg);
+                addToVolatil(msg);
             });
             log.handler(Backup.class, (sender, msg) -> {
-                int i = index.incrementAndGet();
-                volatilLog.put(i,msg);
+                addToVolatil(msg);
             });
             log.open().thenRun(()-> {
                 registHandlers(t, tc, address, d);
-                //readLog();
+                readLog();
                 Store s = new StoreImp();
                 d.oExport(s);
             });
         });
     }
 
+    private void addToVolatil(Object o){
+        int i = index.incrementAndGet();
+        volatilLog.put(i, o);
+    }
+
     private void readLog() {
-        List<Object> list = new ArrayList<>();
+        Map<Integer, Object> list = new HashMap<>();
+        boolean prepared = false;
+        Context ctx = null;
         for(Map.Entry<Integer, Object> e : volatilLog.entrySet()){
             switch(e.getValue().getClass().getName()){
-                case "Prepare":
+                case "log.Prepare":
                     System.out.println("Log: Prepare");
+                    prepared = true;
+                    ctx = ((Prepare) e.getValue()).ctx;
                     break;
-                case "Commit":
+                case "log.Commit":
                     System.out.println("Log: Commit");
-                    list.stream().forEach((o) -> d.oExport(o));
-                    log.trim(e.getKey());
+                    prepared = false;
+                    //list.values().stream().forEach((o) -> d.oExport(o));
+                    //d.print();
                     break;
-                case "Abort":
+                case "log.Abort":
                     System.out.println("Log: Abort");
+                    prepared = false;
                     list.clear();
                     break;
-                case "Backup":
+                case "DO.Backup":
                     System.out.println("Log: Backup");
-                    list.add(e.getValue());
+                    Backup b = (Backup)e.getValue();
+                    list.put(b.getId(), b);
                     break;
             }
+        }
+        if(prepared){
+            System.out.println("Ask manager !!");
         }
     }
 
@@ -143,10 +149,22 @@ public class StoreHandlers {
                         cart = s.newCart();
                         registInManager(m.ctx, s);
                     }
-                    catch(Exception e){ System.out.println("MakeCartError: " + e.getMessage()); }
+                    catch(Exception e){ e.printStackTrace(); }
                     ObjRef ref = d.oExport(cart);
+                    log.append(new Backup(ref.id, cart));
 
                     return Futures.completedFuture(new StoreMakeCartRep(ref));
+                });
+                c.handler(addHistoryReq.class, (m) -> {
+                    StoreImp s = (StoreImp) d.getElement(m.storeid);
+                    try{
+                        s.addHistory(m.value, m.list);
+                        registInManager(m.ctx, s);
+                    }
+                    catch(Exception e){ e.printStackTrace(); }
+                    log.append(new Backup(m.storeid, s));
+
+                    return Futures.completedFuture(new addHistoryRep(true));
                 });
                 c.handler(CartAddReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
@@ -154,18 +172,23 @@ public class StoreHandlers {
                     try {
                         registInManager(m.ctx, null);
                     }
-                    catch (Exception e) { System.out.println("CartAddError: " + e.getMessage()); }
+                    catch (Exception e) { e.printStackTrace(); }
+                    boolean ok = cart.add(b);
+                    log.append(new Backup(m.cartid, cart));
 
-                    return Futures.completedFuture(new CartAddRep(cart.add(b)));
+
+                    return Futures.completedFuture(new CartAddRep(ok));
                 });
                 c.handler(CartBuyReq.class, (m) -> {
                     Cart cart = (Cart) d.getElement(m.cartid);
                     try {
                         registInManager(m.ctx, null);
                     }
-                    catch (Exception e) { System.out.println("CartBuyError: " + e.getMessage()); }
+                    catch (Exception e) { e.printStackTrace(); }
+                    Invoice i = cart.buy();
+                    log.append(new Backup(m.cartid, cart));
 
-                    return Futures.completedFuture(new CartBuyRep(true, cart.buy()));
+                    return Futures.completedFuture(new CartBuyRep(true, i));
                 });
             });
         });
@@ -192,6 +215,10 @@ public class StoreHandlers {
         tc.serializer().register(Context.class);
         tc.serializer().register(Book.class);
         tc.serializer().register(Invoice.class);
+        tc.serializer().register(addHistoryRep.class);
+        tc.serializer().register(addHistoryReq.class);
+        tc.serializer().register(StoreImp.class);
+        tc.serializer().register(CartImp.class);
     }
 
     private void registInManager(Context ctx, StoreImp s) throws Exception {
@@ -206,9 +233,8 @@ public class StoreHandlers {
                     conManager.sendAndReceive(new NewResourceReq(ctx.getTxid(), managerid, address))
             ).join().get();
         }
-        catch (Exception e){
-            System.out.println("Erro in Manager: " + e.getMessage());
-        }
+        catch (Exception e){ e.printStackTrace(); }
+
         if(s != null)
             s.lock();
         this.id = r.idRes;
@@ -234,14 +260,13 @@ public class StoreHandlers {
         tc.execute(()->{
             cli.handler(Prepare.class, (s, m) -> {
                 System.out.println("Prepare");
-                // fazer cenas ! meter as cenas no log aqui
                 log.append(m);
                 cli.send(s,new Ok("Ok"));
             });
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("Commit");
-                si.unlock();
                 log.append(m);
+                si.unlock();
             });
             cli.handler(Rollback.class, (s, m) -> {
                 System.out.println("Rollback");

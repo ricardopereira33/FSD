@@ -8,6 +8,11 @@ package bookstore.Impl;
 import bank.Data.Invoice;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.CatalystSerializable;
+import io.atomix.catalyst.serializer.Serializer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +20,15 @@ import java.util.List;
  *
  * @author Ricardo
  */
-public class CartImp implements Cart {
+public class CartImp implements Cart, CatalystSerializable {
     private List<Book> content;
-    private StoreImp s;
+    private Store s;
+
+    public CartImp(){}
 
     public CartImp(Store s){
         content = new ArrayList<>();
-        this.s = (StoreImp) s;
+        this.s = (Store) s;
     }
 
     @Override
@@ -32,9 +39,21 @@ public class CartImp implements Cart {
 
     @Override
     public Invoice buy() {
-        s.addHistory(content);
         int total = content.stream().mapToInt(Book::getPrice).sum();
+        s.addHistory(total, content);
         content.clear();
         return new Invoice(total, "store");
     }
-  }
+
+    @Override
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+        serializer.writeObject(content, bufferOutput);
+        serializer.writeObject(s, bufferOutput);
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+        content = serializer.readObject(bufferInput);
+        s = serializer.readObject(bufferInput);
+    }
+}

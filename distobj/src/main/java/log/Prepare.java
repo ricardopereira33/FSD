@@ -9,6 +9,7 @@ import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
+import manager.Data.Context;
 
 /**
  *
@@ -16,24 +17,24 @@ import io.atomix.catalyst.serializer.Serializer;
  */
 public class Prepare implements CatalystSerializable {
     public String s;
-    public int txid;
+    public Context ctx;
 
     public Prepare() {}
 
-    public Prepare(String s, int txid){
+    public Prepare(String s, Context ctx){
         this.s = s;
-        this.txid = txid;
+        this.ctx = ctx;
     }
 
     @Override
     public void writeObject(BufferOutput<?> bo, Serializer srlzr) {
         bo.writeString(s);
-        bo.writeInt(txid);
+        srlzr.writeObject(ctx, bo);
     }
 
     @Override
     public void readObject(BufferInput<?> bi, Serializer srlzr) {
         s = bi.readString();
-        txid = bi.readInt();
+        ctx = srlzr.readObject(bi);
     }
 }

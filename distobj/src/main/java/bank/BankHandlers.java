@@ -115,7 +115,6 @@ public class BankHandlers {
                     BankImp b = (BankImp) d.getElement(m.bankid);
                     Account ac = b.access(m.id);
                     try{
-                        System.out.println("fdsf: " + m.ctx);
                         registInManager(m.ctx, b);
                     }
                     catch(Exception e){ e.printStackTrace();}
@@ -176,7 +175,9 @@ public class BankHandlers {
         catch (Exception e){
             System.out.println("Erro in Manager: " + e.getMessage());
         }
-        b.lock();
+        if(b != null)
+            b.lock();
+
         this.id = r.idRes;
     }
 

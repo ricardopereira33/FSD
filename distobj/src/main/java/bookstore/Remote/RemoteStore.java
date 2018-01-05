@@ -6,9 +6,11 @@ import bookstore.Impl.Book;
 import bookstore.Interfaces.Cart;
 import bookstore.Interfaces.Store;
 import bookstore.Rep.StoreMakeCartRep;
+import bookstore.Rep.addHistoryRep;
 import bookstore.Req.StoreSearchReq;
 import bookstore.Req.StoreMakeCartReq;
 import bookstore.Rep.StoreSearchRep;
+import bookstore.Req.addHistoryReq;
 import io.atomix.catalyst.concurrent.SingleThreadContext;
 import io.atomix.catalyst.concurrent.ThreadContext;
 import io.atomix.catalyst.serializer.Serializer;
@@ -18,6 +20,9 @@ import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import manager.Data.Context;
 import manager.Remote.RemoteManager;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class RemoteStore implements Store {
     private final ThreadContext tc;
@@ -48,6 +53,8 @@ public class RemoteStore implements Store {
         tc.serializer().register(Address.class);
         tc.serializer().register(Context.class);
         tc.serializer().register(Book.class);
+        tc.serializer().register(addHistoryRep.class);
+        tc.serializer().register(addHistoryReq.class);
     }
 
     @Override
@@ -73,5 +80,17 @@ public class RemoteStore implements Store {
         ).join().get();
         
         return u.makeCart(r.ref);
+    }
+
+    @Override
+    public void addHistory(int value, List<Book> content)  {
+        Context ctx = RemoteManager.ctx.get();
+        try {
+            addHistoryRep r = (addHistoryRep) tc.execute(() ->
+                    c.sendAndReceive(new addHistoryReq(id, value, content ,ctx))
+            ).join().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

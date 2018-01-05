@@ -70,4 +70,8 @@ public class DO {
         }
         return res;
     }
+
+    public void print() {
+        objs.values().stream().forEach((o) -> System.out.println("Obj: "+o));
+    }
 }

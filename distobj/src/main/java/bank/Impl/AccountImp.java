@@ -6,6 +6,10 @@
 package bank.Impl;
 
 import bank.Interfaces.Account;
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.CatalystSerializable;
+import io.atomix.catalyst.serializer.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.List;
  *
  * @author Ricardo
  */
-public class AccountImp implements Account {
+public class AccountImp implements Account, CatalystSerializable {
     private String id;
     private List<String> history;
     private int value;
@@ -58,4 +62,17 @@ public class AccountImp implements Account {
         history.add("ID: "+ id +"\tValue: " + value);
     }
 
-  }
+    @Override
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+        bufferOutput.writeString(id);
+        serializer.writeObject(history, bufferOutput);
+        bufferOutput.writeInt(value);
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+        id = bufferInput.readString();
+        history = serializer.readObject(bufferInput);
+        value = bufferInput.readInt();
+    }
+}

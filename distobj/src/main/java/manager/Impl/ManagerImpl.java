@@ -7,6 +7,7 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
 import log.*;
+import manager.Data.Context;
 import manager.Data.Transation;
 import manager.Interfaces.Manager;
 import pt.haslab.ekit.Clique;
@@ -51,10 +52,6 @@ public class ManagerImpl{
 
         Clique cli = new Clique(tran,0,add);
 
-        System.out.println("1: " + add[0]);
-        System.out.println("2: " + add[1]);
-        //System.out.println("3: " + add[2]);
-
         tc.execute(() -> {
             cli.handler(Commit.class, (s, m) -> {
                 System.out.println("com");
@@ -73,7 +70,7 @@ public class ManagerImpl{
             cli.open().thenRun(() -> {
                 System.out.println("open");
                 IntStream.range(1, add.length)
-                        .forEach(i -> cli.send(i, new Prepare("Prepare", txid)));
+                        .forEach(i -> cli.send(i, new Prepare("Prepare", new Context(txid, ad))));
             });
         }).join();
         return true;
