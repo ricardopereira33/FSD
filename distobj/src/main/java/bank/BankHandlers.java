@@ -5,6 +5,7 @@ import DO.ObjRef;
 import DO.Obj;
 import DO.Server;
 import DO.Backup;
+import bank.Impl.AccountImp;
 import bank.Impl.BankImp;
 import bank.Interfaces.Account;
 import bank.Rep.*;
@@ -49,38 +50,43 @@ public class BankHandlers extends Server {
         tc.execute( () -> {
             t.server().listen(address, (c) -> {
                 c.handler(accessReq.class, (m) -> {
-                    BankImp b = (BankImp) d.getElement(m.bankid);
-                    Account ac = b.access(m.id);
+                    Obj b =  d.getElement(m.bankid);
+                    Account ac = ((BankImp) b).access(m.id);
                     try{
                         registInManager(m.ctx, b);
                     }
                     catch(Exception e){ e.printStackTrace();}
                     ObjRef or = d.oExport((Obj) ac);
+                    log.append(new Backup(or.id, d.getElement(or.id)));
 
                     return Futures.completedFuture(new accessRep(or));
                 });
                 c.handler(transferReq.class, (m) -> {
-                    Account ac = (Account) d.getElement(m.accountid);
+                    Obj ac =  d.getElement(m.accountid);
                     Account aOther = null;
                     try {
                         aOther = (Account) d.oImport(m.ref);
                         if(aOther == null)
-                            aOther = (Account) d.getElement(m.accountid);
+                            aOther = (Account) d.getElement(m.ref.id);
 
-                        ac.transfer(aOther, m.value);
+                        ((Account) ac).transfer(aOther, m.value);
                     } catch (UnexpectedException e) { e.printStackTrace(); }
+                    log.append(new Backup(m.accountid, ac));
+                    log.append(new Backup(m.ref.id, (Obj) aOther));
 
                     return Futures.completedFuture(new transferRep(true));
                 });
                 c.handler(creditReq.class, (m) -> {
-                    Account ac = (Account) d.getElement(m.accountid);
-                    ac.credit(m.value);
+                    Obj ac = d.getElement(m.accountid);
+                    ((Account) ac).credit(m.value);
+                    log.append(new Backup(m.accountid, ac));
 
                     return Futures.completedFuture(new creditRep(true));
                 });
                 c.handler(debitReq.class, (m) -> {
-                    Account ac = (Account) d.getElement(m.accountid);
-                    ac.debit(m.value);
+                    Obj ac = d.getElement(m.accountid);
+                    ((Account) ac).debit(m.value);
+                    log.append(new Backup(m.accountid, ac));
 
                     return Futures.completedFuture(new debitRep(true));
                 });
@@ -111,5 +117,9 @@ public class BankHandlers extends Server {
         tc.serializer().register(getIdReq.class);
         tc.serializer().register(historyRep.class);
         tc.serializer().register(historyReq.class);
+        tc.serializer().register(Backup.class);
+        tc.serializer().register(Obj.class);
+        tc.serializer().register(BankImp.class);
+        tc.serializer().register(AccountImp.class);
     }
 }

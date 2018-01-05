@@ -24,6 +24,8 @@ public class AccountImp extends Obj implements Account, CatalystSerializable {
     private List<String> history;
     private int value;
 
+    public AccountImp(){}
+
     public AccountImp(String id, int value){
         super();
         this.id = id;

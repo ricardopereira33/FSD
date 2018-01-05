@@ -224,5 +224,6 @@ public abstract class Server {
         tc.serializer().register(Invoice.class);
         tc.serializer().register(NewResourceRep.class);
         tc.serializer().register(NewResourceReq.class);
+        tc.serializer().register(Backup.class);
     }
 }

@@ -56,7 +56,7 @@ public class ManagerImpl extends Obj {
         return t.addAddress(address.port(), address);
     }
 
-    public boolean start2PC(int txid, Address ad, Log log) {
+    public boolean start2PC(int txid, Address ad, Log log, boolean condi) {
         Transation t = trans.get(txid);
         List<Address> list = t.getAddress();
         Address[] add = list.toArray(new Address[list.size()]);
@@ -76,8 +76,14 @@ public class ManagerImpl extends Obj {
             });
             cli.open().thenRun(() -> {
                 System.out.println("open");
-                IntStream.range(1, add.length)
-                        .forEach(i -> cli.send(i, new Prepare("Prepare", new Context(txid, ad))));
+                if(condi){
+                    IntStream.range(1, add.length)
+                            .forEach(i -> cli.send(i, new Rollback("Rollback")));
+                }
+                else{
+                    IntStream.range(1, add.length)
+                            .forEach(i -> cli.send(i, new Prepare("Prepare", new Context(txid, ad))));
+                }
             });
             cli.onException((e) -> e.printStackTrace());
         }).join();

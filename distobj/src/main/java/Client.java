@@ -9,6 +9,8 @@ import bookstore.Interfaces.Store;
 import io.atomix.catalyst.transport.Address;
 import manager.Interfaces.Manager;
 
+import java.util.Scanner;
+
 public class Client {
     public static void main(String[] args) throws Exception {
         DO d = new DO();
@@ -45,6 +47,5 @@ public class Client {
 
         m.commit();
         System.out.println("End.");
-
     }
 }

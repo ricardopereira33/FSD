@@ -112,7 +112,13 @@ public class ManagerHandlers {
             System.out.println("Entrei");
             d.update(list);
             ManagerImpl mi = (ManagerImpl) d.getElement(begin.managerid);
-            mi.start2PC(begin.txid, address, l);
+            mi.start2PC(begin.txid, address, l, false);
+        }
+        else if(!list.isEmpty()){
+            System.out.println("Entrei2");
+            d.update(list);
+            ManagerImpl mi = (ManagerImpl) d.getElement(begin.managerid);
+            mi.start2PC(begin.txid, address, l, true);
         }
     }
 
@@ -123,8 +129,6 @@ public class ManagerHandlers {
                     // new Transation
                     Obj txs = d.getElement(m.managerid);
                     int txid = ((ManagerImpl) txs).newTransation(address);
-
-                    l.append(new Begin("Begin", txid, m.managerid));
 
                     l.append(new Backup(m.managerid, txs));
 
@@ -143,7 +147,8 @@ public class ManagerHandlers {
                     // end Transation
                     ManagerImpl txs = (ManagerImpl) d.getElement(m.managerid);
                     try{
-                        txs.start2PC(m.ctx.getTxid(), address, l);
+                        l.append(new Begin("Begin", m.ctx.getTxid(), m.managerid));
+                        txs.start2PC(m.ctx.getTxid(), address, l, false);
                     }
                     catch(Exception e){ e.printStackTrace(); }
 
@@ -171,5 +176,6 @@ public class ManagerHandlers {
         tc.serializer().register(Obj.class);
         tc.serializer().register(Context.class);
         tc.serializer().register(Begin.class);
+        tc.serializer().register(Begin2PC.class);
     }
 }

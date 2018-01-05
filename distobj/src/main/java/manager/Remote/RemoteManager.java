@@ -19,14 +19,15 @@ import manager.Req.NewResourceReq;
 import java.util.concurrent.ExecutionException;
 
 public class RemoteManager implements Manager{
-    private final Connection c;
-    private final ThreadContext tc;
-    private final Address address;
+    private Connection c;
+    private ThreadContext tc;
+    private Address address;
+    private Transport t;
     private int id;
     public static ThreadLocal<Context> ctx = new ThreadLocal<Context>();
 
     public RemoteManager(int id, Address address) throws ExecutionException, InterruptedException {
-        Transport t = new NettyTransport();
+        t = new NettyTransport();
         tc = new SingleThreadContext("srv-%d", new Serializer());
         this.address = address;
         this.id = id;
@@ -68,7 +69,7 @@ public class RemoteManager implements Manager{
                     c.sendAndReceive(new CommitReq(con, id))
             ).join().get();
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
         ctx.set(null);
